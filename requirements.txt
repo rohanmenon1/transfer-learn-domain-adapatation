@@ -1,0 +1,3 @@
+torch==2.13.0  # install from https://download.pytorch.org/whl/rocm7.1
+torchvision
+timm>=1.0.30
