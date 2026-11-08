@@ -4,7 +4,7 @@ Adaptation speed of DINOv3 ViT-S models trained with ERM or knowledge distillati
 
 ## Summary
 
-- **Single-source transfer:** KD results pending.
+- **Single-source transfer:** KD with a ViT-B teacher differs from ERM in adaptation AUC by +0.11 points on average (higher in 68 of 90 comparisons).
 - **Leave-one-domain-out:** KD with a ViT-B teacher differs from ERM in adaptation AUC by +0.32 points (higher in 18 of 18 comparisons, from 6 models × 3 samples); KD with source-expert teachers by +0.04.
 - **Training on DomainNet sources:** ERM adapts 8.4 AUC points better on average than pretrained DINOv3 without DomainNet training, except on quickdraw, where the pretrained model adapts better.
 - **Distance:** for single-source ERM pairs, adaptation AUC decreases with distance (Fréchet ρ = -0.70, p = 0.022; OTDD ρ = -0.58, p = 0.076; n = 30); significant at p < 0.05 for Fréchet only. Leave-one-domain-out correlations use n = 6 and are reported in Section 4.
@@ -39,11 +39,11 @@ Top-1 accuracy (%) on the source domain's full test set, and the mean over the o
 | Source | ERM, source | ERM, other five | KD, source | KD, other five | ViT-B teacher, source | ViT-B teacher, other five |
 |---|--:|--:|--:|--:|--:|--:|
 | clipart | 77.4 | 41.8 | 77.8 | 41.6 | 83.4 | 50.0 |
-| infograph | 43.5 | 42.3 | pending | pending | pending | pending |
-| painting | 71.7 | 38.8 | pending | pending | pending | pending |
-| quickdraw | 63.4 | 22.9 | pending | pending | pending | pending |
-| real | 80.5 | 37.7 | pending | pending | pending | pending |
-| sketch | 67.6 | 45.0 | pending | pending | pending | pending |
+| infograph | 43.5 | 42.3 | 43.9 | 42.9 | 51.7 | 54.0 |
+| painting | 71.7 | 38.8 | 72.1 | 39.0 | 78.1 | 48.1 |
+| quickdraw | 63.4 | 22.9 | 64.1 | 22.8 | 67.3 | 35.1 |
+| real | 80.5 | 37.7 | 80.5 | 37.2 | 85.2 | 46.6 |
+| sketch | 67.6 | 45.0 | 67.9 | 44.9 | 75.2 | 51.9 |
 
 ### 2.2 Adaptation to each target
 
@@ -51,14 +51,14 @@ Mean AUC over the five targets and three 10-shot samples, and the paired differe
 
 | Source | ERM, mean AUC | KD, mean AUC | KD − ERM, AUC points |
 |---|--:|--:|--:|
-| clipart | 56.3 | pending | pending |
-| infograph | 59.0 | pending | pending |
-| painting | 55.8 | pending | pending |
-| quickdraw | 49.8 | pending | pending |
-| real | 53.7 | pending | pending |
-| sketch | 57.8 | pending | pending |
+| clipart | 56.3 | 56.3 | +0.06 (range -0.26 to +0.27; higher in 11 of 15) |
+| infograph | 59.0 | 59.2 | +0.23 (range -0.03 to +0.45; higher in 14 of 15) |
+| painting | 55.8 | 55.9 | +0.17 (range -0.08 to +0.36; higher in 13 of 15) |
+| quickdraw | 49.8 | 49.9 | +0.07 (range -0.17 to +0.37; higher in 10 of 15) |
+| real | 53.7 | 53.7 | +0.07 (range -0.12 to +0.39; higher in 9 of 15) |
+| sketch | 57.8 | 57.8 | +0.04 (range -0.29 to +0.25; higher in 11 of 15) |
 
-**All pairs:** KD − ERM = pending over 0 of 90 (source, target, sample) comparisons. Comparisons that share a model are not independent.
+**All pairs:** KD − ERM = +0.11 (range -0.29 to +0.45; higher in 68 of 90) over 90 of 90 (source, target, sample) comparisons. Comparisons that share a model are not independent.
 
 ## 3. Leave-one-domain-out (train on five domains, adapt to the sixth)
 
@@ -117,6 +117,8 @@ Spearman correlation between distance and adaptation AUC (a negative ρ means th
 |---|---|---|---|---|
 | Single source, ERM | OTDD | 30 | -0.58 | 0.076 |
 | Single source, ERM | Fréchet | 30 | -0.70 | 0.022 |
+| Single source, KD, ViT-B teacher | OTDD | 30 | -0.59 | 0.064 |
+| Single source, KD, ViT-B teacher | Fréchet | 30 | -0.71 | 0.019 |
 | Leave-one-out, DINOv3, no DomainNet training (LP-FT) | OTDD | 6 | -0.26 | 0.659 |
 | Leave-one-out, ERM | OTDD | 6 | -0.37 | 0.495 |
 | Leave-one-out, KD, source-expert teachers | OTDD | 6 | -0.37 | 0.495 |
@@ -144,6 +146,7 @@ Single jobs can be run directly, e.g. `python kd_train.py src-student --domain s
 
 ## Figures
 
+- **fig1_single_source_kd_vs_erm** (`fig1_single_source_kd_vs_erm.png`, `fig1_single_source_kd_vs_erm.svg`): Paired difference in adaptation AUC between the KD and ERM models for every (source, target) pair, averaged over three 10-shot samples.
 - **fig2_lodo_heldout_accuracy** (`fig2_lodo_heldout_accuracy.png`, `fig2_lodo_heldout_accuracy.svg`): Accuracy on the held-out domain before adaptation. Dashed lines mark the in-domain ceiling. Each model was trained once.
 - **fig3_lodo_adaptation_curves** (`fig3_lodo_adaptation_curves.png`, `fig3_lodo_adaptation_curves.svg`): Accuracy on the held-out domain during fine-tuning, one panel per held-out domain. The dashed line marks 90% of the in-domain ceiling.
 - **fig4_distance_vs_adaptation** (`fig4_distance_vs_adaptation.png`, `fig4_distance_vs_adaptation.svg`): Adaptation AUC against OTDD. Left: one point per (source, target) pair. Right: one point per held-out domain and starting model; points are offset horizontally by up to 0.05 so that overlapping methods stay visible.
