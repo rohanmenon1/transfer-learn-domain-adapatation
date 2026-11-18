@@ -20,7 +20,7 @@ def parse_args():
     p = argparse.ArgumentParser(description="MAML on DomainNet")
     #TODO: change backbone to resnet NVM
     p.add_argument("--backbone", default="dinov3")
-    p.add_argument("--domains", nargs="+", default=["painting"])
+    p.add_argument("--domains", nargs="+", default=["real", "painting"])
     p.add_argument("--n-way", type=int, default=5)
     p.add_argument("--k-shot", type=int, default=5)
     p.add_argument("--q-query", type=int, default=5)
