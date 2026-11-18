@@ -5,6 +5,7 @@
 Safe to run at any time: experiments that have not finished yet are shown as pending.
 """
 import argparse
+import csv
 import itertools
 import json
 from pathlib import Path
@@ -31,6 +32,21 @@ LODO_STUD = [("erm", "ERM", C_ERM), ("kd-kd-experts", "KD, source-expert teacher
              ("kd-kd-vitb", "KD, ViT-B teacher", C_KD)]
 LODO_INIT = [("dinov3-lpft", "DINOv3, no DomainNet training (LP-FT)", C_BASE), ("erm-5k", "ERM", C_ERM),
              ("kd-experts-5k", "KD, source-expert teachers", C_KDX), ("kd-vitb-5k", "KD, ViT-B teacher", C_KD)]
+# Shared OTDD table used by all methods for the train-on-two analysis: distance from source (row) to target
+# (column) on DINOv3 features of 100 training images per class, minus the noise floor (distance between two
+# random halves of one domain, about 3.5).
+_TEAM_OTDD = [[0, 2.12, 1.72, 2.86, 1.73, 0.87],
+              [2.13, 0, 2.44, 4.16, 2.55, 2.10],
+              [1.73, 2.44, 0, 3.89, 1.32, 1.36],
+              [2.86, 4.15, 3.91, 0, 4.14, 2.63],
+              [1.72, 2.53, 1.32, 4.12, 0, 1.61],
+              [0.89, 2.10, 1.36, 2.66, 1.60, 0]]
+TEAM_OTDD = {a: {b: _TEAM_OTDD[i][j] for j, b in enumerate(D)} for i, a in enumerate(D)}
+PAIRS = list(itertools.combinations(D, 2))
+PAIR_SHORT = "kd2-T4w0.5-src-{}+{}"
+PLATEAU_TOL = 1.5  # accuracy points
+SWEEP_SOURCES = ["clipart", "sketch"]
+SWEEP = [(1, 0.5), (2, 0.5), (4, 0.5), (2, 0.9), (4, 0.9)]
 DIVERGING = LinearSegmentedColormap.from_list("blue_grey_red", ["#1c5cab", "#86b6ef", "#f0efec", "#ef9a99", "#c62f2f"])
 
 plt.rcParams.update({
@@ -147,10 +163,12 @@ def setup_section(R):
         ("Training data", "50 images per class and domain (seeded sample, identical to finetune.py), 345 classes"),
         ("Training recipe", "finetune.py: AdamW (backbone lr 3e-5, head lr 1e-3, weight decay 0.05), batch 64, "
                             "1-epoch warm-up then cosine decay, bf16"),
-        ("Training length", "one source domain: 10 epochs (finetune.py); five source domains: 5,000 steps "
-                            "(DomainBed default)"),
+        ("Training length", "one or two source domains: 10 epochs over the source images (finetune.py); five "
+                            "source domains: 5,000 steps (DomainBed default); all six domains (reference): 10 epochs"),
         ("ERM", "cross-entropy on the source data"),
-        ("KD", "Hinton et al. (2015), T = 1, 0.5 cross-entropy + 0.5 KL divergence to the teacher"),
+        ("KD", "Hinton et al. (2015): (1 − w) cross-entropy + w KL divergence to the teacher at temperature T. "
+               "Sections 2.1-2.2 and 3: T = 1, w = 0.5; Section 5: T = 4, w = 0.5, chosen by the sweep in "
+               "Section 2.3"),
         ("Baseline", "pretrained DINOv3 without DomainNet training. Its classifier head is first fitted on the "
                      "10-shot data with the backbone frozen, then the whole model is fine-tuned (LP-FT, Kumar et al. "
                      "2022); a randomly initialised head would put it at an unfair disadvantage. ERM and KD models "
@@ -160,8 +178,8 @@ def setup_section(R):
         ("Adaptation metrics", "steps to reach 80%, 90% and 95% of the target's in-domain ceiling; "
                                "AUC = mean accuracy over the 500 steps"),
         ("Ceiling", "in-domain accuracy of DINOv3 ViT-S fine-tuned on the target domain (notes.md)"),
-        ("Repetitions", "each model is trained once; each adaptation test is repeated with 3 different "
-                        "10-shot samples"),
+        ("Repetitions", "each model is trained once; adaptation tests in Sections 2.2 and 3 are repeated with 3 "
+                        "different 10-shot samples, those in Sections 2.3 and 5 use one sample"),
     ]
     return ["## 1. Experimental setup", ""] + table(["Item", "Setting"], rows, numeric=False) + ["", check.strip(), ""]
 
@@ -234,7 +252,44 @@ def single_source_section(R, out, figs):
         save(fig, out, "fig1_single_source_kd_vs_erm")
         figs.append(("fig1_single_source_kd_vs_erm", "Paired difference in adaptation AUC between the KD and ERM "
                      "models for every (source, target) pair, averaged over three 10-shot samples."))
+    md += sweep_subsection(R)
     return md, all_d
+
+
+def seed0(r):
+    """The first 10-shot sample (seed 0) of an adaptation result."""
+    return next((x for x in r.get("runs", []) if x["seed"] == 0), None) if r else None
+
+
+def sweep_subsection(R):
+    md = ["### 2.3 KD hyperparameters", "",
+          "Temperature T and KD weight w (cross-entropy weight 1 − w) for single-domain students trained on "
+          f"{' and '.join(SWEEP_SOURCES)} and adapted to the other five domains. Each cell is the mean paired AUC "
+          "difference against the ERM model of the same source over the five targets, using the first 10-shot "
+          "sample only.", ""]
+    rows, best = [], None
+    for T, w in SWEEP:
+        cells, allv = [], []
+        for s in SWEEP_SOURCES:
+            short = f"kd-vitb-src-{s}" if (T, w) == (1, 0.5) else f"kdsweep-T{T:g}w{w:g}-src-{s}"
+            v = []
+            for t in D:
+                if t == s:
+                    continue
+                k, e = seed0(R.adapt(short, t)), seed0(R.adapt(f"expert-{s}", t))
+                if k and e:
+                    v.append(k["auc"] - e["auc"])
+            cells.append(PENDING if len(v) < 5 else f"{np.mean(v):+.2f} (higher in {sum(x > 0 for x in v)} of 5)")
+            allv += v
+        if len(allv) == 10 and (best is None or np.mean(allv) > best[0]):
+            best = (np.mean(allv), T, w)
+        rows.append([f"T = {T:g}, w = {w:g}" + (" (setting of Section 2.2)" if (T, w) == (1, 0.5) else "")] + cells)
+    md += table(["Setting"] + [f"KD − ERM AUC, source {s}" for s in SWEEP_SOURCES], rows, numeric=False)
+    if best:
+        md += ["", f"T = {best[1]:g}, w = {best[2]:g} gives the largest difference and is used for the two-source "
+                   "students in Section 5. With two sources and one 10-shot sample, the sweep selects a setting "
+                   "rather than establishing an effect."]
+    return md + [""]
 
 
 def lodo_section(R, out, figs):
@@ -381,8 +436,17 @@ def distance_section(R, out, figs):
     return md, res
 
 
-def summary_section(R, ss_d, lodo_d, dres):
+def summary_section(R, ss_d, lodo_d, dres, pres=None):
     lines = ["## Summary", ""]
+    if pres:
+        T, rows = pres
+        p, s95 = T["plateau_pct"], T["steps_to_95pct_final"]
+        lines.append(f"- **Train on two domains (KD, n = {len(rows)} runs):** source pairs farther from the target "
+                     f"take longer to converge. Within target, ρ = {p['within']:+.2f} (p = {pval(p['p_within'])}) "
+                     f"for the plateau step and {s95['within']:+.2f} (p = {pval(s95['p_within'])}) for steps to 95% "
+                     f"of final accuracy; pooled over targets, ρ = {p['pooled']:+.2f} (p = {pval(p['p_pooled'])}) "
+                     f"and {s95['pooled']:+.2f} (p = {pval(s95['p_pooled'])}). On quickdraw, every source pair "
+                     "converges late.")
     if ss_d:
         lines.append(f"- **Single-source transfer:** KD with a ViT-B teacher differs from ERM in adaptation AUC by "
                      f"{np.mean(ss_d):+.2f} points on average (higher in {sum(x > 0 for x in ss_d)} "
@@ -411,8 +475,181 @@ def summary_section(R, ss_d, lodo_d, dres):
     return lines + [""]
 
 
+def plateau_step(curve, tol=PLATEAU_TOL):
+    """First evaluation step after which accuracy stays within tol points of the run's final accuracy."""
+    fin = curve[-1][1]
+    for k, (s, _) in enumerate(curve):
+        if all(abs(a - fin) <= tol for _, a in curve[k:]):
+            return s
+
+
+def steps_to_frac_final(curve, frac=0.95):
+    fin = curve[-1][1]
+    return next(s for s, a in curve if a >= frac * fin)
+
+
+def pair_rows(R):
+    rows = []
+    for a, b in PAIRS:
+        for t in D:
+            if t in (a, b):
+                continue
+            run = seed0(R.adapt(PAIR_SHORT.format(a, b), t))
+            if not run:
+                continue
+            c, total = run["curve"], run["curve"][-1][0]
+            rows.append({"source_a": a, "source_b": b, "target": t,
+                         "otdd": round((TEAM_OTDD[a][t] + TEAM_OTDD[b][t]) / 2, 3),
+                         "plateau_step": plateau_step(c), "plateau_pct": round(100 * plateau_step(c) / total, 1),
+                         "steps_to_95pct_final": steps_to_frac_final(c), "auc": round(run["auc"], 2),
+                         "start_acc": run["start"], "final_acc": run["end"]})
+    return rows
+
+
+def pair_tests(rows, key, dist):
+    """Spearman rho between source-pair distance and `key`, pooled and within target (mean of the per-target rho).
+    p-values from all 720 relabelings of the six domains applied to the distance table, because runs that share
+    a domain are not independent."""
+    y, tg = np.array([r[key] for r in rows], float), np.array([r["target"] for r in rows])
+
+    def stats(M):
+        x = np.array([(M[r["source_a"]][r["target"]] + M[r["source_b"]][r["target"]]) / 2 for r in rows])
+        per = {t: float(np.corrcoef(rankdata(x[tg == t]), rankdata(y[tg == t]))[0, 1]) for t in D
+               if (tg == t).sum() >= 4 and np.ptp(y[tg == t]) > 0}
+        return float(np.corrcoef(rankdata(x), rankdata(y))[0, 1]), float(np.mean(list(per.values()))), per
+
+    pooled, within, per = stats(dist)
+    null = []
+    for p in itertools.permutations(range(6)):
+        m = {D[i]: D[p[i]] for i in range(6)}
+        null.append(stats({a: {b: dist[m[a]][m[b]] for b in D} for a in D})[:2])
+    null = np.array(null)
+    return {"pooled": pooled, "p_pooled": float((np.abs(null[:, 0]) >= abs(pooled) - 1e-12).mean()),
+            "within": within, "p_within": float((np.abs(null[:, 1]) >= abs(within) - 1e-12).mean()), "per": per}
+
+
+def pairs_section(R, out, figs):
+    md = ["## 5. Train on two domains, adapt to each of the other four", "",
+          "A KD student is trained on each of the 15 pairs of source domains (10 epochs over both domains' images); "
+          "each image is distilled from the single-domain ViT-B teacher of its own domain (T = 4, w = 0.5). Each "
+          "student is then adapted to each of the four other domains with the adaptation test of Section 1 (one "
+          "10-shot sample), giving 60 (source pair, target) runs.", "",
+          "- **Convergence:** the plateau step is the first evaluation step after which accuracy stays within "
+          f"{PLATEAU_TOL} points of the run's final accuracy, reported as a percentage of the 500 fine-tuning steps. "
+          "Steps to 95% of the run's final accuracy and AUC are reported as well. Accuracy is evaluated every 10 "
+          "steps up to step 100 and every 50 steps after that, so step-based values are coarse.",
+          "- **Distance:** shared OTDD table (DINOv3 features of 100 training images per class, noise floor "
+          "subtracted); the distance of a source pair to a target is the mean of the two sources' distances.",
+          "- **Tests:** Spearman ρ, pooled over all runs and within target (mean of the six per-target ρ, which "
+          "removes differences in target difficulty); p-values from all 720 relabelings of the six domains.", ""]
+    rows = pair_rows(R)
+    if len(rows) < 12:
+        return md + [f"Pending: {len(rows)} of 60 runs complete.", ""], None
+    with open(out / "pairs_kd.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    O = R.get("distance_dinov3").get("otdd", {}).get("pairwise")
+    T, trows = {}, []
+    for key, lab in (("plateau_pct", "% of training at plateau"), ("steps_to_95pct_final", "steps to 95% of final"),
+                     ("auc", "AUC (higher = better)")):
+        T[key] = s = pair_tests(rows, key, TEAM_OTDD)
+        trows.append([lab, len(rows), f"{s['pooled']:+.2f}", pval(s["p_pooled"]), f"{s['within']:+.2f}",
+                      pval(s["p_within"])])
+    md += table(["Convergence measure", "n", "Pooled ρ", "p", "Within-target ρ", "p"], trows, numeric=False)
+    md += ["", "A positive ρ for the step measures means that source pairs farther from the target take longer; a "
+               "negative ρ for AUC means that they adapt worse."]
+    if O:
+        s1, s2 = pair_tests(rows, "plateau_pct", O), pair_tests(rows, "steps_to_95pct_final", O)
+        md += ["", f"With the OTDD of Section 4 in place of the shared table, the within-target ρ is "
+                   f"{s1['within']:+.2f} (p = {pval(s1['p_within'])}) for the plateau and {s2['within']:+.2f} "
+                   f"(p = {pval(s2['p_within'])}) for steps to 95% of final accuracy."]
+    md += ["", "Per target:", ""]
+    prow = []
+    for t in D:
+        sub = [r for r in rows if r["target"] == t]
+        if sub:
+            rho = T["plateau_pct"]["per"].get(t)
+            prow.append([t, len(sub), f"{np.mean([r['plateau_pct'] for r in sub]):.0f}",
+                         f"{np.mean([r['steps_to_95pct_final'] for r in sub]):.0f}",
+                         f"{np.mean([r['final_acc'] for r in sub]):.1f}", "–" if rho is None else f"{rho:+.2f}"])
+    md += table(["Target", "n", "Plateau, % of training (mean)", "Steps to 95% of final (mean)",
+                 "Final accuracy (mean)", "ρ, distance vs plateau"], prow)
+    md += ["", "`pairs_kd.csv` has one row per run: source pair, target, distance, plateau step and percentage, steps "
+               "to 95% of final accuracy, AUC, and accuracy at the first and last step.", ""]
+
+    x, y = [r["otdd"] for r in rows], [r["plateau_pct"] for r in rows]
+    fig, ax = plt.subplots(figsize=(8.5, 5.4))
+    ax.scatter(x, y, s=60, color=C_KD, edgecolor="white", lw=1.5, zorder=3,
+               label=f"KD, ViT-B teachers (n = {len(rows)})")
+    k, c = np.polyfit(x, y, 1)
+    xs = np.array([min(x), max(x)])
+    ax.plot(xs, k * xs + c, color=C_KD, alpha=0.6, label="Least-squares fit")
+    ax.set_ylim(0, 100)
+    ax.set_xlabel("OTDD, source pair → target (mean of the two sources)")
+    ax.set_ylabel("Fine-tuning completed at plateau (%)")
+    s = T["plateau_pct"]
+    ax.set_title(f"Train on two domains: distance and convergence on the target\nPooled ρ = {s['pooled']:+.2f} "
+                 f"(p = {pval(s['p_pooled'])}); within-target ρ = {s['within']:+.2f} (p = {pval(s['p_within'])})",
+                 loc="left")
+    ax.legend(loc="upper left", fontsize=10)
+    save(fig, out, "fig5_pairs_distance_vs_plateau")
+    figs.append(("fig5_pairs_distance_vs_plateau", "One point per (source pair, target) run: distance against the "
+                 f"share of fine-tuning completed when accuracy settles within {PLATEAU_TOL} points of its final "
+                 "value."))
+
+    fig, axs = plt.subplots(2, 3, figsize=(14, 8), sharey=True)
+    for ax, t in zip(axs.flat, D):
+        sub = [r for r in rows if r["target"] == t]
+        xs_, ys_ = [r["otdd"] for r in sub], [r["plateau_pct"] for r in sub]
+        ax.scatter(xs_, ys_, s=56, color=C_KD, edgecolor="white", lw=1.5, zorder=3)
+        if len(sub) >= 3 and np.ptp(xs_) > 0:
+            k, c = np.polyfit(xs_, ys_, 1)
+            xx = np.array([min(xs_), max(xs_)])
+            ax.plot(xx, k * xx + c, color=C_KD, alpha=0.6)
+        rho = T["plateau_pct"]["per"].get(t)
+        ax.set_title(f"Target: {t}   (ρ = {rho:+.2f}, n = {len(sub)})" if rho is not None else f"Target: {t}",
+                     loc="left")
+        ax.set_ylim(0, 100)
+    for ax in axs[1]:
+        ax.set_xlabel("OTDD, source pair → target")
+    for ax in axs[:, 0]:
+        ax.set_ylabel("Fine-tuning completed at plateau (%)")
+    fig.suptitle("Within each target: distance of the source pair and convergence (KD, one run per point)",
+                 x=0.01, ha="left", fontweight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.96))
+    save(fig, out, "fig6_pairs_by_target")
+    figs.append(("fig6_pairs_by_target", "The runs of fig5 split by target domain; each panel compares the ten "
+                 "source pairs on the same target, so target difficulty is held fixed."))
+    return md, (T, rows)
+
+
+def reference_section(R, pres):
+    r = R.get("erm_dinov3_all6_10ep_s0")
+    md = ["## 6. Reference: ERM on all six domains", "",
+          "Upper reference for accuracy: a DINOv3 ViT-S trained with ERM on all six domains (50 images per class "
+          "and domain, 10 epochs), including each target. It is compared with the final accuracy of the "
+          "two-source KD students after adaptation, which see 10 images per class of the target.", ""]
+    if not r:
+        return md + [PENDING, ""]
+    rows_p = pres[1] if pres else []
+    rows = []
+    for t in D:
+        fin = [x["final_acc"] for x in rows_p if x["target"] == t]
+        sub = r["acc_adapt_subset_20pc"][t]
+        rows.append([t, f"{r['acc_full_test'][t]:.1f}", f"{sub:.1f}", f"{CEILING[t]:.1f}",
+                     f"{np.mean(fin):.1f} ({min(fin):.1f}–{max(fin):.1f})" if fin else PENDING,
+                     f"{np.mean(fin) - sub:+.1f}" if fin else PENDING])
+    md += table(["Domain", "Reference, full test set", "Reference, adaptation test subset", "Ceiling (one domain)",
+                 "Two-source KD after adaptation, mean (range)", "Difference to reference"], rows, numeric=False)
+    md += ["", "Accuracy in %. The adaptation test subset (20 images per class) is the one used for every adaptation "
+               "run, so it can be compared directly with the last two columns. The ceiling is the single-domain "
+               "model of notes.md, measured on the full test set.", ""]
+    return md
+
+
 LIMITATIONS = [
-    "## 5. Limitations", "",
+    "## 7. Limitations", "",
     "- Each model was trained once. The three repetitions re-sample the 10-shot fine-tuning data only, so "
     "differences in held-out accuracy below about one point have no error estimate.",
     "- Infograph and quickdraw have the lowest ceilings and are also the most distant domains, so the distance "
@@ -421,7 +658,9 @@ LIMITATIONS = [
     "the same trained model (several targets or 10-shot samples) are not independent, so counts such as "
     "\"higher in 18 of 18\" overstate the evidence if read as independent trials.",
     "- KD and ERM students train for the same number of steps on the same images, but KD additionally requires "
-    "training the ViT-B teacher, so its total compute is higher.", ""]
+    "training the ViT-B teacher, so its total compute is higher.",
+    "- Section 5 has KD students only, one 10-shot sample per run, and no ERM model trained on the same source "
+    "pairs, so it describes how distance relates to convergence for KD but does not compare methods.", ""]
 
 REPRODUCE = [
     "## Reproducing these results", "",
@@ -435,7 +674,9 @@ REPRODUCE = [
     "Single jobs can be run directly, e.g. `python kd_train.py src-student --domain sketch` or "
     "`python kd_adapt.py --init models/expert_dinov3_real_s0.pt --target sketch`. "
     "Approximate cost on one RTX 3080 Laptop GPU (8 GB): about 25 GPU-hours for the single-source experiments "
-    "(Section 2) and about 28 GPU-hours for leave-one-domain-out (Section 3).", ""]
+    "(Sections 2.1-2.2), about 5 GPU-hours for the KD hyperparameter sweep (Section 2.3), about 28 GPU-hours "
+    "for leave-one-domain-out (Section 3), about 14 GPU-hours for the two-source experiments (Section 5) and "
+    "about 2 GPU-hours for the reference model (Section 6).", ""]
 
 
 def main():
@@ -451,10 +692,13 @@ def main():
     ss_md, ss_d = single_source_section(R, a.out, figs)
     lodo_md, lodo_d = lodo_section(R, a.out, figs)
     dist_md, dres = distance_section(R, a.out, figs)
+    pairs_md, pres = pairs_section(R, a.out, figs)
+    ref_md = reference_section(R, pres)
     md = ["# Knowledge distillation and ERM on DomainNet", "",
           "Adaptation speed of DINOv3 ViT-S models trained with ERM or knowledge distillation (KD), measured as "
           "accuracy on a new domain during few-shot fine-tuning.", ""]
-    md += summary_section(R, ss_d, lodo_d, dres) + setup_section(R) + ss_md + lodo_md + dist_md + LIMITATIONS + REPRODUCE
+    md += (summary_section(R, ss_d, lodo_d, dres, pres) + setup_section(R) + ss_md + lodo_md + dist_md + pairs_md
+           + ref_md + LIMITATIONS + REPRODUCE)
     if figs:
         md += ["## Figures", ""] + [f"- **{n}** (`{n}.png`, `{n}.svg`): {c}" for n, c in figs] + [""]
     md += ["_Generated by kd_report.py from results/*.json._"]

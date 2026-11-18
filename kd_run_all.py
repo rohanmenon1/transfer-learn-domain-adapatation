@@ -9,6 +9,7 @@
 """
 import argparse
 import ctypes
+import itertools
 import datetime as dt
 import json
 import os
@@ -23,10 +24,13 @@ PY = sys.executable
 DOMAINS = ["clipart", "infograph", "painting", "quickdraw", "real", "sketch"]
 TARGETS = ["sketch", "quickdraw", "painting", "infograph", "clipart", "real"]
 # expected minutes per job kind on an RTX 3080 Laptop GPU (8 GB); rescaled by measured times at run time
-EST = {"distance": 5, "expert": 25, "src-teacher": 30, "src-student": 20, "lodo-teacher": 60,
-       "lodo-student": 45, "adapt": 6, "adapt12": 11}
+EST = {"distance": 5, "expert": 25, "src-teacher": 30, "src-student": 20, "pair-student": 38, "all6-erm": 120,
+       "lodo-teacher": 60, "lodo-student": 45, "adapt": 6, "adapt12": 11}
 TEACHER_ACCUM = 2  # ViT-B teacher: batch 64 as 2 x 32 to fit in 8 GB
 MAX_ATTEMPTS = 3   # transient out-of-memory errors usually succeed on a retry
+SWEEP_SOURCES = ["clipart", "sketch"]
+SWEEP_CONFIGS = [(2.0, 0.5), (4.0, 0.5), (2.0, 0.9), (4.0, 0.9)]  # (temperature, KD weight)
+PAIR_CONFIG = (4.0, 0.5)  # best sweep setting, used for the train-on-two students
 
 
 def jobs_list(smoke, res_dir, models_dir):
@@ -39,13 +43,14 @@ def jobs_list(smoke, res_dir, models_dir):
         J.append({"id": id_, "kind": kind, "cmd": [PY, script, *sub, *args],
                   "result": res_dir / result, "needs": list(needs)})
 
-    def adapt(short, init, t, needs, lpft=False):
-        # seed 0, then seeds 1-2 in a second file (same starting model, new 10-shot samples)
+    def adapt(short, init, t, needs, lpft=False, extra_seeds=True):
+        # seed 0, then (unless extra_seeds=False) seeds 1-2 in a second file (same model, new 10-shot samples)
         base = ["--init", init, "--name", short, "--target", t] + (["--lpft"] if lpft else [])
         add(f"adapt2_{short}_to-{t}", "adapt", base + ["--seeds", "0"], f"adapt_{short}_to-{t}_k10_v2.json",
             needs, script="kd_adapt.py")
-        add(f"adapt2s12_{short}_to-{t}", "adapt12", base + ["--seeds", "1", "2", "--tag", "v2_s12"],
-            f"adapt_{short}_to-{t}_k10_v2_s12.json", needs, script="kd_adapt.py")
+        if extra_seeds:
+            add(f"adapt2s12_{short}_to-{t}", "adapt12", base + ["--seeds", "1", "2", "--tag", "v2_s12"],
+                f"adapt_{short}_to-{t}_k10_v2_s12.json", needs, script="kd_adapt.py")
 
     def lodo_student(method, teacher, t, needs):
         n = f"{'erm' if method == 'erm' else f'kd-{method}-{teacher}'}_dinov3_lodo-{t}_5k_s0"
@@ -81,6 +86,27 @@ def jobs_list(smoke, res_dir, models_dir):
         add(tn, "lodo-teacher", ["--target", t, "--accum", str(TEACHER_ACCUM)], tn + ".json")
         n = lodo_student("kd", "vitb", t, [tn])
         adapt("kd-vitb-5k", ck(n), t, [n])
+    # 5. KD hyperparameter sweep: temperature x KD weight, two source domains, adaptation seed 0
+    for s_ in (["sketch"] if smoke else SWEEP_SOURCES):
+        tn = f"teacher-vitb_dinov3_src-{s_}_s0"
+        for T, w in SWEEP_CONFIGS:
+            sn = f"kdsweep-vitb_dinov3_src-{s_}_T{T:g}_w{w:g}_s0"
+            add(sn, "src-student", ["--domain", s_, "--T", str(T), "--wkd", str(w)], sn + ".json", [tn])
+            for t in DOMAINS:
+                if t != s_:
+                    adapt(f"kdsweep-T{T:g}w{w:g}-src-{s_}", ck(sn), t, [sn], extra_seeds=False)
+    # 6. train on two domains (15 pairs), adapt to each of the other four: KD, adaptation seed 0
+    T, w = PAIR_CONFIG
+    pairs = [("clipart", "sketch")] if smoke else list(itertools.combinations(DOMAINS, 2))
+    for a_, b_ in pairs:
+        sn = f"kd-vitb_dinov3_src-{a_}+{b_}_T{T:g}_w{w:g}_s0"
+        add(sn, "pair-student", ["--domains", a_, b_, "--T", str(T), "--wkd", str(w)], sn + ".json",
+            [f"teacher-vitb_dinov3_src-{a_}_s0", f"teacher-vitb_dinov3_src-{b_}_s0"])
+        for t in DOMAINS:
+            if t not in (a_, b_):
+                adapt(f"kd2-T{T:g}w{w:g}-src-{a_}+{b_}", ck(sn), t, [sn], extra_seeds=False)
+    # 7. quality reference: ERM on all six domains
+    add("erm_dinov3_all6_10ep_s0", "all6-erm", [], "erm_dinov3_all6_10ep_s0.json")
     return J
 
 
@@ -196,6 +222,7 @@ def main():
             extra = {"expert": lambda: f"in-domain {r.get('in_domain')}% (ceiling {r.get('ceiling')})",
                      "src-teacher": lambda: f"in-domain {r.get('in_domain')}%, mean on other 5 {r.get('cross_mean')}%",
                      "src-student": lambda: f"in-domain {r.get('in_domain')}%, mean on other 5 {r.get('cross_mean')}%",
+                     "pair-student": lambda: f"sources {r.get('source_mean')}%, mean on other 4 {r.get('cross_mean')}%",
                      "lodo-student": lambda: f"held-out {r.get('heldout')}%",
                      "lodo-teacher": lambda: f"teacher held-out {r.get('heldout')}%",
                      "adapt": lambda: f"start {r.get('start_mean')}%, AUC {r.get('auc_mean')}",
