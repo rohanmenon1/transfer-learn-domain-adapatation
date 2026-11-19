@@ -5,13 +5,13 @@ from pathlib import Path
 
 import torch
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
+from torch.utils.data import ConcatDataset, DataLoader
 
 from common import DOMAINS, NUM_CLASSES, DomainNet, accuracy, backbone, test_loader
 
 p = argparse.ArgumentParser()
 p.add_argument("--backbone", default="dinov3")
-p.add_argument("--source", default="real")
+p.add_argument("--source", nargs="+", default=["real"])
 p.add_argument("--targets", nargs="+", default=DOMAINS)
 p.add_argument("--per-class", type=int, default=50)
 p.add_argument("--epochs", type=int, default=10)
@@ -22,7 +22,7 @@ args = p.parse_args()
 
 torch.manual_seed(args.seed)
 model = backbone(args.backbone, NUM_CLASSES)
-train = DataLoader(DomainNet(args.source, "train", train=True, per_class=args.per_class, seed=args.seed),
+train = DataLoader(ConcatDataset([DomainNet(s, "train", train=True, per_class=args.per_class, seed=args.seed) for s in args.source]),
                    batch_size=64, shuffle=True, drop_last=True, num_workers=10, persistent_workers=True)
 
 
@@ -32,7 +32,7 @@ opt = torch.optim.AdamW([{"params": body, "lr": args.lr}, {"params": head, "lr":
 steps, warmup = args.epochs * len(train), len(train)
 sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min((s + 1) / warmup, 0.5 * (1 + math.cos(math.pi * s / steps))))
 
-out = Path(f"results/ft_{args.backbone}_{args.source}_pc{args.per_class}_s{args.seed}.json")
+out = Path(f"results/ft_{args.backbone}_{"+".join(args.source)}_pc{args.per_class}_s{args.seed}.json")
 out.parent.mkdir(exist_ok=True)
 
 
@@ -41,8 +41,16 @@ def save(**extra):
 
 
 subsets = {d: test_loader(d, 2000, args.seed) for d in args.targets}
+Path("models").mkdir(exist_ok=True)
+last = Path(f"models/{out.stem}_last.pt")
 history = []
-for epoch in range(args.epochs + 1):
+if last.exists():
+    ckpt = torch.load(last)
+    model.load_state_dict(ckpt["model"])
+    opt.load_state_dict(ckpt["opt"])
+    sched.load_state_dict(ckpt["sched"])
+    history = ckpt["history"]
+for epoch in range(len(history), args.epochs + 1):
     if epoch:
         for x, y in train:
             with torch.autocast("cuda", torch.bfloat16):
@@ -54,6 +62,7 @@ for epoch in range(args.epochs + 1):
     history.append({"step": epoch * len(train), **{d: accuracy(model, l) for d, l in subsets.items()}})
     print(history[-1], flush=True)
     save()
+    torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "sched": sched.state_dict(), "history": history}, last)
 
-Path("models").mkdir(exist_ok=True)
 torch.save(model.state_dict(), f"models/{out.stem}.pt")
+last.unlink()
