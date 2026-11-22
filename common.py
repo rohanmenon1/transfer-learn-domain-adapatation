@@ -55,6 +55,7 @@ def load_domainnet_from_hub():
 
 class DomainNet(Dataset):
     _dataset = None
+    _image_cache: dict = {}
 
     def __init__(
         self,
@@ -159,17 +160,23 @@ class DomainNet(Dataset):
     def __len__(self):
         return len(self.items)
 
+    def prewarm_cache(self):
+        """Pre-load all PIL images into the class-level cache to avoid repeated HF dataset lookups during episode sampling."""
+        for row_idx, _ in self.items:
+            if row_idx not in DomainNet._image_cache:
+                image = self.data[row_idx][self.image_col]
+                DomainNet._image_cache[row_idx] = image.convert("RGB")
+
     def __getitem__(self, i):
         row_idx, label = self.items[i]
-        image = self.data[row_idx][self.image_col]
-
-        if not isinstance(image, Image.Image):
-            raise TypeError(
-                f"Expected a PIL image, got {type(image)}"
-            )
-
-        image = image.convert("RGB")
-        return self.tf(image), label
+        if row_idx not in DomainNet._image_cache:
+            image = self.data[row_idx][self.image_col]
+            if not isinstance(image, Image.Image):
+                raise TypeError(
+                    f"Expected a PIL image, got {type(image)}"
+                )
+            DomainNet._image_cache[row_idx] = image.convert("RGB")
+        return self.tf(DomainNet._image_cache[row_idx]), label
 
 
 def test_loader(domain, limit=0, seed=0):

@@ -3,7 +3,6 @@
 
 import argparse
 import json
-import math
 from pathlib import Path
 
 import torch
@@ -101,11 +100,12 @@ def train_one_epoch(model, loader, optimizer, scheduler):
         x = x.cuda(non_blocking=True)
         y = y.cuda(non_blocking=True)
 
+        optimizer.zero_grad(set_to_none=True)
+
         with torch.autocast("cuda", dtype=torch.bfloat16):
             logits = model(x)
             loss = F.cross_entropy(logits.float(), y)
 
-        optimizer.zero_grad(set_to_none=True)
         loss.backward()
         optimizer.step()
         scheduler.step()
@@ -124,6 +124,11 @@ def fine_tune_domain(args, domain, maml_checkpoint):
     print(f"\n{'=' * 60}")
     print(f"Fine-tuning on {domain}")
     print(f"{'=' * 60}")
+
+    # Free any VRAM left over from a previous domain before allocating
+    # the new model + dataloader workers.  This prevents the CUBLAS
+    # execution failures that surface when memory is fragmented.
+    torch.cuda.empty_cache()
 
     torch.manual_seed(args.seed)
 
@@ -145,7 +150,7 @@ def fine_tune_domain(args, domain, maml_checkpoint):
         batch_size=args.batch_size,
         shuffle=True,
         drop_last=True,
-        num_workers=10,
+        num_workers=4,
         persistent_workers=True,
         pin_memory=True,
     )
@@ -174,19 +179,11 @@ def fine_tune_domain(args, domain, maml_checkpoint):
         weight_decay=args.weight_decay,
     )
 
-    total_steps = args.epochs * len(train)
     warmup_steps = len(train)
 
     scheduler = torch.optim.lr_scheduler.LambdaLR(
         optimizer,
-        lambda step: min(
-            (step + 1) / warmup_steps,
-            0.5 * (
-                1 + math.cos(
-                    math.pi * step / total_steps
-                )
-            ),
-        ),
+        lambda step: min((step + 1) / warmup_steps, 1.0),
     )
 
     history = []

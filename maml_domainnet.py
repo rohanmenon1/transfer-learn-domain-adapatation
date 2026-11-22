@@ -28,7 +28,7 @@ def parse_args():
     p.add_argument("--inner-lr", type=float, default=1e-3)
     p.add_argument("--meta-lr", type=float, default=1e-6)
     p.add_argument("--episodes", type=int, default=550)
-    p.add_argument("--meta-batch", type=int, default=1)
+    p.add_argument("--meta-batch", type=int, default=4)
     p.add_argument("--per-class", type=int, default=50)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--output", default="maml_domainnet")
@@ -118,6 +118,9 @@ def make_tasks(args):
             f"{domain}: {len(dataset):,} images, "
             f"{len(tasks[domain].classes)} eligible classes"
         )
+        print(f"Pre-loading {domain} images into RAM cache...", flush=True)
+        dataset.prewarm_cache()
+        print(f"Done caching {domain}.", flush=True)
 
     return tasks
 
