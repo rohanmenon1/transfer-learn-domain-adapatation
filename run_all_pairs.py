@@ -23,7 +23,7 @@ EPISODES = 550
 META_LR = 1e-6
 INNER_LR = 1e-3
 INNER_STEPS = 1
-META_BATCH = 2
+META_BATCH = 4
 
 PER_CLASS = 50
 EPOCHS = 10
@@ -34,10 +34,32 @@ SEED = 0
 
 MODEL_DIR = Path("models")
 RESULT_DIR = Path("results")
+CHECKPOINT_PATH = RESULT_DIR / "all_pairs_checkpoint.json"
 
 MODEL_DIR.mkdir(exist_ok=True)
 RESULT_DIR.mkdir(exist_ok=True)
 
+def load_checkpoint():
+    if not CHECKPOINT_PATH.exists():
+        return []
+
+    with CHECKPOINT_PATH.open("r") as f:
+        return json.load(f)
+
+
+def save_checkpoint(results):
+    CHECKPOINT_PATH.write_text(
+        json.dumps(results, indent=2)
+    )
+
+
+def experiment_completed(results, source1, source2, target):
+    return any(
+        r["source_1"] == source1
+        and r["source_2"] == source2
+        and r["target"] == target
+        for r in results
+    )
 
 def run_command(command):
     """Execute a Python experiment and stop on failure."""
@@ -49,15 +71,20 @@ def run_command(command):
         check=True,
     )
 
-
 def main():
 
     pairs = list(itertools.combinations(DOMAINS, 2))
 
-    all_results = []
+    # Load previously completed experiments.
+    all_results = load_checkpoint()
+
+    completed = len(all_results)
+    total = len(pairs) * 4
 
     print(f"Total source pairs: {len(pairs)}")
-    print(f"Total experiments: {len(pairs) * 4}")
+    print(f"Total experiments: {total}")
+    print(f"Previously completed: {completed}")
+    print(f"Remaining: {total - completed}")
 
     for pair_idx, (source1, source2) in enumerate(pairs, 1):
 
@@ -73,34 +100,40 @@ def main():
         maml_checkpoint = MODEL_DIR / f"maml_{experiment}.pt"
 
         # -------------------------------------------------
-        # 1. Train MAML on the two source domains.
+        # 1. Train MAML if its checkpoint doesn't exist.
         # -------------------------------------------------
 
-        command = [
-            sys.executable,
-            "maml_domainnet.py",
+        if not maml_checkpoint.exists():
 
-            "--backbone", BACKBONE,
+            print(f"\nTraining MAML for {experiment}...")
 
-            "--domains", source1, source2,
+            command = [
+                sys.executable,
+                "maml_domainnet.py",
 
-            "--n-way", str(N_WAY),
-            "--k-shot", str(K_SHOT),
-            "--q-query", str(Q_QUERY),
+                "--backbone", BACKBONE,
+                "--domains", source1, source2,
 
-            "--episodes", str(EPISODES),
-            "--meta-lr", str(META_LR),
-            "--inner-lr", str(INNER_LR),
-            "--inner-steps", str(INNER_STEPS),
-            "--meta-batch", str(META_BATCH),
+                "--n-way", str(N_WAY),
+                "--k-shot", str(K_SHOT),
+                "--q-query", str(Q_QUERY),
 
-            "--per-class", str(PER_CLASS),
-            "--seed", str(SEED),
+                "--episodes", str(EPISODES),
+                "--meta-lr", str(META_LR),
+                "--inner-lr", str(INNER_LR),
+                "--inner-steps", str(INNER_STEPS),
+                "--meta-batch", str(META_BATCH),
 
-            "--output", f"maml_{experiment}",
-        ]
+                "--per-class", str(PER_CLASS),
+                "--seed", str(SEED),
 
-        run_command(command)
+                "--output", f"maml_{experiment}",
+            ]
+
+            run_command(command)
+
+        else:
+            print(f"Using existing MAML checkpoint: {maml_checkpoint}")
 
         if not maml_checkpoint.exists():
             raise FileNotFoundError(maml_checkpoint)
@@ -116,6 +149,15 @@ def main():
 
         for target_idx, target in enumerate(targets, 1):
 
+            if experiment_completed(
+                all_results, source1, source2, target
+            ):
+                print(
+                    f"\nSkipping completed experiment: "
+                    f"{experiment} -> {target}"
+                )
+                continue
+
             print("\n" + "-" * 60)
             print(
                 f"Fine-tuning {experiment} on {target} "
@@ -128,9 +170,7 @@ def main():
                 "finetune_maml.py",
 
                 "--backbone", BACKBONE,
-
                 "--maml-checkpoint", str(maml_checkpoint),
-
                 "--targets", target,
 
                 "--per-class", str(PER_CLASS),
@@ -140,10 +180,11 @@ def main():
                 "--head-lr", str(HEAD_LR),
 
                 "--seed", str(SEED),
-
                 "--experiment", experiment,
             ]
 
+            # If this fails, execution stops here.
+            # Previously completed experiments remain saved.
             run_command(command)
 
             # -------------------------------------------------
@@ -156,6 +197,11 @@ def main():
             )
 
             result_path = RESULT_DIR / f"{result_name}.json"
+
+            if not result_path.exists():
+                raise FileNotFoundError(
+                    f"Expected result file not found: {result_path}"
+                )
 
             result = json.loads(result_path.read_text())
 
@@ -173,16 +219,18 @@ def main():
 
             all_results.append(record)
 
+            # Save immediately after every successful experiment.
+            save_checkpoint(all_results)
+            save_results(all_results)
+
             print("\nExperiment result:")
             print(json.dumps(record, indent=2))
-
-            # Save after every experiment so progress is retained.
-            save_results(all_results)
 
     print("\n" + "=" * 70)
     print("ALL EXPERIMENTS COMPLETED")
     print("=" * 70)
 
+    save_checkpoint(all_results)
     save_results(all_results)
 
     print_summary(all_results)

@@ -91,6 +91,19 @@ def load_maml_initialization(model, checkpoint):
 
 
 def train_one_epoch(model, loader, optimizer, scheduler):
+    if torch.cuda.is_available():
+        print(
+            f"Allocated: "
+            f"{torch.cuda.memory_allocated() / 1024**3:.2f} GB | "
+            f"Reserved: "
+            f"{torch.cuda.memory_reserved() / 1024**3:.2f} GB | "
+            f"Peak: "
+            f"{torch.cuda.max_memory_allocated() / 1024**3:.2f} GB",
+            flush=True,
+        )
+        print(torch.cuda.mem_get_info())
+
+    
     model.train()
     total_loss = 0.0
     total_correct = 0
@@ -190,10 +203,12 @@ def fine_tune_domain(args, domain, maml_checkpoint):
 
     # Evaluate the initialized model before fine-tuning.
     initial_accuracy = accuracy(model, test)
+    torch.cuda.empty_cache()
 
     print(f"Initial accuracy: {initial_accuracy:.4f}")
 
     for epoch in range(1, args.epochs + 1):
+        torch.cuda.reset_peak_memory_stats()
 
         train_metrics = train_one_epoch(
             model,
@@ -203,6 +218,7 @@ def fine_tune_domain(args, domain, maml_checkpoint):
         )
 
         test_accuracy = accuracy(model, test)
+        torch.cuda.empty_cache()
 
         record = {
             "epoch": epoch,

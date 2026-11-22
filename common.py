@@ -1,24 +1,31 @@
 import os
 
 os.environ.setdefault("TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL", "1")
+
 import random
+import warnings
 from collections import defaultdict
+from io import BytesIO
 from pathlib import Path
 
-HF_DATASET = "wltjr1007/DomainNet"
-
-
+import pyarrow as pa
+import pyarrow.compute as pc
+import pyarrow.parquet as pq
+import timm
 import torch
-from datasets import load_dataset
+import torch.nn.functional as F
+from huggingface_hub import snapshot_download
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms as T
-import warnings
-import timm
 
 warnings.filterwarnings("ignore", message=".*still experimental.*")
+try:
+    pa.jemalloc_set_decay_ms(0)
+except (AttributeError, NotImplementedError, Exception):
+    pass
 
-ROOT = Path(os.environ.get("DOMAINNET_ROOT", "~/stuff/data/domainnet")).expanduser()
+REPO = "wltjr1007/DomainNet"
 DOMAINS = ["clipart", "infograph", "painting", "quickdraw", "real", "sketch"]
 NUM_CLASSES = 345
 BACKBONES = {
@@ -38,149 +45,38 @@ def backbone(name, num_classes=0, pretrained=True):
     return timm.create_model(BACKBONES[name], pretrained=pretrained, num_classes=num_classes).cuda()
 
 
-def load_domainnet_from_hub():
-    """Download/cache the Hugging Face dataset and inspect its schema."""
-    ds = load_dataset(HF_DATASET)
-
-    print("Dataset splits:", list(ds.keys()))
-    for split, data in ds.items():
-        print(f"{split}: {len(data):,} examples")
-        print("Columns:", data.column_names)
-        print("Features:", data.features)
-
-    return ds
-
-
-   
-
 class DomainNet(Dataset):
-    _dataset = None
-    _image_cache: dict = {}
-
-    def __init__(
-        self,
-        domain,
-        split,
-        train=False,
-        per_class=0,
-        limit=0,
-        seed=0,
-    ):
-        # Download/cache the dataset once per Python process.
-        if DomainNet._dataset is None:
-            DomainNet._dataset = load_dataset(HF_DATASET)
-
-        ds = DomainNet._dataset
-
-        if split not in ds:
-            raise ValueError(
-                f"Unknown split {split!r}. "
-                f"Available splits: {list(ds.keys())}"
-            )
-
-        data = ds[split]
-
-        # Inspect the schema to identify the actual column names.
-        columns = data.column_names
-
-        def find_column(candidates):
-            return next(
-                (c for c in candidates if c in columns),
-                None,
-            )
-
-        image_col = find_column(["image", "img"])
-        label_col = find_column(["label", "labels", "category"])
-        domain_col = find_column(
-            ["domain", "domain_name", "domain_id"]
-        )
-
-        if not all([image_col, label_col, domain_col]):
-            raise ValueError(
-                f"Cannot identify image, label, and domain columns. "
-                f"Columns: {columns}. "
-                f"Inspect the dataset schema to update the candidates."
-            )
-
-        domain_feature = data.features[domain_col]
-        label_feature = data.features[label_col]
-
-        def feature_value(feature, value):
-            if hasattr(feature, "int2str") and isinstance(value, int):
-                return feature.int2str(value)
-            return str(value)
-
-        # Select rows belonging to the requested domain.
-        domain_indices = []
-        for i, value in enumerate(data[domain_col]):
-            if feature_value(domain_feature, value).lower() == domain.lower():
-                domain_indices.append(i)
-
-        if not domain_indices:
-            raise ValueError(
-                f"No rows found for domain {domain!r}. "
-                f"Example domain values: {data[domain_col][:10]}"
-            )
-
-        items = [
-            (i, int(data[i][label_col]))
-            for i in domain_indices
-        ]
-
-        # Optional class-balanced sampling.
+    def __init__(self, domain, split, train=False, per_class=0, limit=0, seed=0):
+        files = sorted(str(f) for f in Path(snapshot_download(REPO, repo_type="dataset", allow_patterns=f"data/{split}-*")).glob(f"data/{split}-*.parquet"))
+        table = pq.read_table(files, columns=["image", "label"], filters=[("domain", "=", DOMAINS.index(domain))])
+        labels = table["label"].to_pylist()
+        idx = list(range(len(labels)))
         if per_class:
             by_class = defaultdict(list)
-            for item in items:
-                by_class[item[1]].append(item)
-
+            for i in idx:
+                by_class[labels[i]].append(i)
             rng = random.Random(seed)
-            items = [
-                item
-                for label in sorted(by_class)
-                for item in (
-                    by_class[label]
-                    if len(by_class[label]) <= per_class
-                    else rng.sample(by_class[label], per_class)
-                )
-            ]
-
+            idx = [i for c in sorted(by_class) for i in (by_class[c] if len(by_class[c]) <= per_class else rng.sample(by_class[c], per_class))]
         if limit:
-            if limit > len(items):
-                raise ValueError(
-                    f"Requested {limit} samples, "
-                    f"but only {len(items)} are available."
-                )
-            items = random.Random(seed).sample(items, limit)
-
-        self.data = data
-        self.image_col = image_col
-        self.items = items
+            idx = random.Random(seed).sample(idx, limit)
+        images = pc.struct_field(table["image"], "bytes")
+        self.images, self.labels = images.cast(pa.large_binary()).take(idx) if len(idx) < len(labels) else images, [labels[i] for i in idx]
         self.tf = TRAIN_TF if train else TEST_TF
 
-    def __len__(self):
-        return len(self.items)
+    @property
+    def items(self):
+        """Backward-compatible access to (index, label) pairs."""
+        return list(enumerate(self.labels))
 
-    def prewarm_cache(self):
-        """Pre-load all PIL images into the class-level cache to avoid repeated HF dataset lookups during episode sampling."""
-        for row_idx, _ in self.items:
-            if row_idx not in DomainNet._image_cache:
-                image = self.data[row_idx][self.image_col]
-                DomainNet._image_cache[row_idx] = image.convert("RGB")
+    def __len__(self):
+        return len(self.labels)
 
     def __getitem__(self, i):
-        row_idx, label = self.items[i]
-        if row_idx not in DomainNet._image_cache:
-            image = self.data[row_idx][self.image_col]
-            if not isinstance(image, Image.Image):
-                raise TypeError(
-                    f"Expected a PIL image, got {type(image)}"
-                )
-            DomainNet._image_cache[row_idx] = image.convert("RGB")
-        return self.tf(DomainNet._image_cache[row_idx]), label
+        return self.tf(Image.open(BytesIO(self.images[i].as_py())).convert("RGB")), self.labels[i]
 
 
 def test_loader(domain, limit=0, seed=0):
-    return DataLoader(DomainNet(domain, "test", limit=limit, seed=seed), batch_size=256, num_workers=10)
+    return DataLoader(DomainNet(domain, "test", limit=limit, seed=seed), batch_size=256, num_workers=4)
 
 
 @torch.no_grad()
@@ -192,3 +88,31 @@ def accuracy(model, loader):
             hits += (model(x.cuda()).argmax(1).cpu() == y).sum().item()
     model.train()
     return hits / len(loader.dataset)
+
+
+@torch.no_grad()
+def features(model, data):
+    model.eval()
+    with torch.autocast("cuda", torch.bfloat16):
+        f, y = zip(*[(model.forward_head(model.forward_features(x.cuda()), pre_logits=True).float(), y.cuda()) for x, y in DataLoader(data, batch_size=256, num_workers=4)])
+    model.train()
+    return torch.cat(f), torch.cat(y)
+
+
+def linear_probe(model, data):
+    x, y = features(model, data)
+    head = model.get_classifier()
+    w = torch.zeros_like(head.weight, dtype=torch.float32, requires_grad=True)
+    b = torch.zeros_like(head.bias, dtype=torch.float32, requires_grad=True)
+    opt = torch.optim.LBFGS([w, b], max_iter=300, history_size=20, line_search_fn="strong_wolfe")
+
+    def closure():
+        opt.zero_grad()
+        loss = F.cross_entropy(x @ w.t() + b, y) + 1e-4 * (w ** 2).sum()
+        loss.backward()
+        return loss
+
+    opt.step(closure)
+    with torch.no_grad():
+        head.weight.copy_(w)
+        head.bias.copy_(b)

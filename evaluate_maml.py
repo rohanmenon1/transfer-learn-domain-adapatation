@@ -75,7 +75,7 @@ def main():
 
     # Select classes present in both splits
     by_class = defaultdict(list)
-    for i, (_, label) in enumerate(train_dataset.items):
+    for i, label in enumerate(train_dataset.labels):
         by_class[label].append(i)
 
     eligible = [label for label, ids in by_class.items() if len(ids) >= args.batch_size]
@@ -85,8 +85,8 @@ def main():
     selected = sorted(random.sample(eligible, n_way))
     label_map = {label: i for i, label in enumerate(selected)}
 
-    train_indices = [i for i, (_, label) in enumerate(train_dataset.items) if label in label_map]
-    test_indices = [i for i, (_, label) in enumerate(test_dataset.items) if label in label_map]
+    train_indices = [i for i, label in enumerate(train_dataset.labels) if label in label_map]
+    test_indices = [i for i, label in enumerate(test_dataset.labels) if label in label_map]
 
     train_loader = DataLoader(
         RemappedDataset(train_dataset, train_indices, label_map),
