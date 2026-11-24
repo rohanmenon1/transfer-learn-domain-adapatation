@@ -1,0 +1,148 @@
+{
+  "job": {
+    "version": "domainnet-shared-v1",
+    "identity": {
+      "sources": [
+        "clipart",
+        "infograph"
+      ],
+      "source_sha256": [
+        "e4903b7df68ed1d93cd907750b13e1c24669c6aafab0ddddfb6d0abdacd8f411",
+        "b9edaefeca85f63c323a105a5d5498bf223202c4ef6ebd8247700eb8ee63df5a"
+      ],
+      "manifest_sha256": "bb4f055490231ce42342d18990fa8ec12b9972d09600c358507d1175c48e3aea",
+      "target": "quickdraw",
+      "average_sha256": "3a3725b9061efd1c0e3ef2bdc0262d3da9e884dc31ab0edc7e982b3830f1fa5b"
+    },
+    "settings": {
+      "batch_size": 64,
+      "image_size": 224,
+      "backbone_lr": 3e-05,
+      "head_lr": 0.001,
+      "weight_decay": 0.05,
+      "warmup_steps": 100,
+      "eval_every": 100,
+      "max_epochs": 10,
+      "patience_epochs": 2,
+      "min_gain_points": 0.5,
+      "relative_threshold": 0.95,
+      "precision": "bfloat16",
+      "drop_last": true
+    },
+    "seed": 0,
+    "source": false,
+    "device": "cuda",
+    "torch_version": "2.14.1+cu130",
+    "train_hash": "096207e6353590ecec654cee67c2565378e912fdafa432b1451dc1c99d8729c3",
+    "test_hash": "fce640c619d87381b2db639283b284ff8c136c4d2086397e82343ef701381caf"
+  },
+  "steps": 2300,
+  "steps_per_epoch": 269,
+  "n_train": 17250,
+  "n_test": 2000,
+  "elapsed_seconds": 493.1971682590006,
+  "best_accuracy": 64.3,
+  "threshold_accuracy": 61.084999999999994,
+  "converged_at": 1100,
+  "stopped_by": "plateau",
+  "plateau_confirmed": true,
+  "budget_censored": false,
+  "curve": [
+    [
+      0,
+      13.7
+    ],
+    [
+      100,
+      33.15
+    ],
+    [
+      200,
+      43.9
+    ],
+    [
+      300,
+      48.75
+    ],
+    [
+      400,
+      52.5
+    ],
+    [
+      500,
+      55.55
+    ],
+    [
+      600,
+      56.7
+    ],
+    [
+      700,
+      57.45
+    ],
+    [
+      800,
+      60.1
+    ],
+    [
+      900,
+      59.85
+    ],
+    [
+      1000,
+      60.25
+    ],
+    [
+      1100,
+      62.0
+    ],
+    [
+      1200,
+      62.6
+    ],
+    [
+      1300,
+      62.7
+    ],
+    [
+      1400,
+      62.95
+    ],
+    [
+      1500,
+      61.95
+    ],
+    [
+      1600,
+      62.5
+    ],
+    [
+      1700,
+      64.1
+    ],
+    [
+      1800,
+      63.9
+    ],
+    [
+      1900,
+      63.1
+    ],
+    [
+      2000,
+      63.9
+    ],
+    [
+      2100,
+      63.45
+    ],
+    [
+      2200,
+      64.2
+    ],
+    [
+      2300,
+      64.3
+    ]
+  ]
+}

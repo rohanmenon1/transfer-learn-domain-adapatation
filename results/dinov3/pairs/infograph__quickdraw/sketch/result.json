@@ -1,0 +1,116 @@
+{
+  "job": {
+    "version": "domainnet-shared-v1",
+    "identity": {
+      "sources": [
+        "infograph",
+        "quickdraw"
+      ],
+      "source_sha256": [
+        "b9edaefeca85f63c323a105a5d5498bf223202c4ef6ebd8247700eb8ee63df5a",
+        "20f3d21a4adfca2d0866b040d7c4396fd347045369be964fa1d0eabe9ffa8052"
+      ],
+      "manifest_sha256": "bb4f055490231ce42342d18990fa8ec12b9972d09600c358507d1175c48e3aea",
+      "target": "sketch",
+      "average_sha256": "8ea89c7e3850f8ccf218ee46a3772491617aa27453e043b939d8e75e7a1cbcfc"
+    },
+    "settings": {
+      "batch_size": 64,
+      "image_size": 224,
+      "backbone_lr": 3e-05,
+      "head_lr": 0.001,
+      "weight_decay": 0.05,
+      "warmup_steps": 100,
+      "eval_every": 100,
+      "max_epochs": 10,
+      "patience_epochs": 2,
+      "min_gain_points": 0.5,
+      "relative_threshold": 0.95,
+      "precision": "bfloat16",
+      "drop_last": true
+    },
+    "seed": 0,
+    "source": false,
+    "device": "cuda",
+    "torch_version": "2.14.1+cu130",
+    "train_hash": "eaf1097b0665892d02112c9c7ae37d3d3e904e0e83f1b4b33d7cb6784d1b490c",
+    "test_hash": "c3c7f94076328a100f7fe6774c13a3f20e3413c9191083e0b832f19971be853a"
+  },
+  "steps": 1500,
+  "steps_per_epoch": 255,
+  "n_train": 16365,
+  "n_test": 2000,
+  "elapsed_seconds": 447.64875319099883,
+  "best_accuracy": 67.45,
+  "threshold_accuracy": 64.0775,
+  "converged_at": 400,
+  "stopped_by": "plateau",
+  "plateau_confirmed": true,
+  "budget_censored": false,
+  "curve": [
+    [
+      0,
+      46.05
+    ],
+    [
+      100,
+      55.45
+    ],
+    [
+      200,
+      59.95
+    ],
+    [
+      300,
+      61.5
+    ],
+    [
+      400,
+      64.7
+    ],
+    [
+      500,
+      64.7
+    ],
+    [
+      600,
+      65.1
+    ],
+    [
+      700,
+      65.5
+    ],
+    [
+      800,
+      66.45
+    ],
+    [
+      900,
+      67.0
+    ],
+    [
+      1000,
+      67.0
+    ],
+    [
+      1100,
+      66.9
+    ],
+    [
+      1200,
+      67.4
+    ],
+    [
+      1300,
+      67.1
+    ],
+    [
+      1400,
+      67.45
+    ],
+    [
+      1500,
+      67.05
+    ]
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "job": {
+    "version": "domainnet-shared-v1",
+    "identity": {
+      "sources": [
+        "clipart",
+        "infograph"
+      ],
+      "source_sha256": [
+        "e4903b7df68ed1d93cd907750b13e1c24669c6aafab0ddddfb6d0abdacd8f411",
+        "b9edaefeca85f63c323a105a5d5498bf223202c4ef6ebd8247700eb8ee63df5a"
+      ],
+      "manifest_sha256": "bb4f055490231ce42342d18990fa8ec12b9972d09600c358507d1175c48e3aea",
+      "target": "real",
+      "average_sha256": "3a3725b9061efd1c0e3ef2bdc0262d3da9e884dc31ab0edc7e982b3830f1fa5b"
+    },
+    "settings": {
+      "batch_size": 64,
+      "image_size": 224,
+      "backbone_lr": 3e-05,
+      "head_lr": 0.001,
+      "weight_decay": 0.05,
+      "warmup_steps": 100,
+      "eval_every": 100,
+      "max_epochs": 10,
+      "patience_epochs": 2,
+      "min_gain_points": 0.5,
+      "relative_threshold": 0.95,
+      "precision": "bfloat16",
+      "drop_last": true
+    },
+    "seed": 0,
+    "source": false,
+    "device": "cuda",
+    "torch_version": "2.14.1+cu130",
+    "train_hash": "e69ce32565e11c88c0fd4030bfe1c79f07c792ea1fa795c88abc5cd60ccd59fd",
+    "test_hash": "23ad370f03494bd25d8f1d20a11102fe0d65b57217edc6a650abe1bd02fa7953"
+  },
+  "steps": 1700,
+  "steps_per_epoch": 268,
+  "n_train": 17164,
+  "n_test": 2000,
+  "elapsed_seconds": 477.28863408100005,
+  "best_accuracy": 83.45,
+  "threshold_accuracy": 79.2775,
+  "converged_at": 300,
+  "stopped_by": "plateau",
+  "plateau_confirmed": true,
+  "budget_censored": false,
+  "curve": [
+    [
+      0,
+      70.55
+    ],
+    [
+      100,
+      75.8
+    ],
+    [
+      200,
+      78.3
+    ],
+    [
+      300,
+      80.0
+    ],
+    [
+      400,
+      80.75
+    ],
+    [
+      500,
+      81.05
+    ],
+    [
+      600,
+      81.9
+    ],
+    [
+      700,
+      81.5
+    ],
+    [
+      800,
+      82.1
+    ],
+    [
+      900,
+      82.45
+    ],
+    [
+      1000,
+      82.65
+    ],
+    [
+      1100,
+      83.45
+    ],
+    [
+      1200,
+      83.15
+    ],
+    [
+      1300,
+      82.25
+    ],
+    [
+      1400,
+      81.8
+    ],
+    [
+      1500,
+      82.55
+    ],
+    [
+      1600,
+      82.7
+    ],
+    [
+      1700,
+      82.2
+    ]
+  ]
+}

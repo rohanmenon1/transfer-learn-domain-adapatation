@@ -1,0 +1,116 @@
+{
+  "job": {
+    "version": "domainnet-shared-v1",
+    "identity": {
+      "sources": [
+        "painting",
+        "sketch"
+      ],
+      "source_sha256": [
+        "0487e09cc6e6b41a97ba3d4cd3ffa41e49d89a7a84019a9e47dd051ad063c614",
+        "b6b3c4d02c4a89f907afb4fea0ddac7b7360640ae2bfab9805162468cb9106f4"
+      ],
+      "manifest_sha256": "bb4f055490231ce42342d18990fa8ec12b9972d09600c358507d1175c48e3aea",
+      "target": "clipart",
+      "average_sha256": "08469453d8a478c3c97b35ec672e9f2aa66e7cdf5404c44d29c4f532c8fd0289"
+    },
+    "settings": {
+      "batch_size": 64,
+      "image_size": 224,
+      "backbone_lr": 3e-05,
+      "head_lr": 0.001,
+      "weight_decay": 0.05,
+      "warmup_steps": 100,
+      "eval_every": 100,
+      "max_epochs": 10,
+      "patience_epochs": 2,
+      "min_gain_points": 0.5,
+      "relative_threshold": 0.95,
+      "precision": "bfloat16",
+      "drop_last": true
+    },
+    "seed": 0,
+    "source": false,
+    "device": "cuda",
+    "torch_version": "2.14.1+cu130",
+    "train_hash": "92a48c6d780fb2aae663310f67b4ad2b10ed234a6b27e59c3015444306f7e945",
+    "test_hash": "bb2b8c2e42db53619183e53b6059a8ee6985e656af978fc6e869cab55319725d"
+  },
+  "steps": 1500,
+  "steps_per_epoch": 248,
+  "n_train": 15911,
+  "n_test": 2000,
+  "elapsed_seconds": 396.54323929399834,
+  "best_accuracy": 78.5,
+  "threshold_accuracy": 74.575,
+  "converged_at": 400,
+  "stopped_by": "plateau",
+  "plateau_confirmed": true,
+  "budget_censored": false,
+  "curve": [
+    [
+      0,
+      61.55
+    ],
+    [
+      100,
+      69.1
+    ],
+    [
+      200,
+      72.7
+    ],
+    [
+      300,
+      74.3
+    ],
+    [
+      400,
+      75.8
+    ],
+    [
+      500,
+      75.6
+    ],
+    [
+      600,
+      76.05
+    ],
+    [
+      700,
+      77.15
+    ],
+    [
+      800,
+      77.2
+    ],
+    [
+      900,
+      76.85
+    ],
+    [
+      1000,
+      78.35
+    ],
+    [
+      1100,
+      77.9
+    ],
+    [
+      1200,
+      77.6
+    ],
+    [
+      1300,
+      76.9
+    ],
+    [
+      1400,
+      78.5
+    ],
+    [
+      1500,
+      78.15
+    ]
+  ]
+}

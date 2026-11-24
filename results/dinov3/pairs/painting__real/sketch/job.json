@@ -1,0 +1,37 @@
+{
+  "version": "domainnet-shared-v1",
+  "identity": {
+    "sources": [
+      "painting",
+      "real"
+    ],
+    "source_sha256": [
+      "0487e09cc6e6b41a97ba3d4cd3ffa41e49d89a7a84019a9e47dd051ad063c614",
+      "7d0237d08818d1b455a7dbe5d8a637c22e550aa181e510f054c29277671977e0"
+    ],
+    "manifest_sha256": "bb4f055490231ce42342d18990fa8ec12b9972d09600c358507d1175c48e3aea",
+    "target": "sketch",
+    "average_sha256": "c217441760d846e66a097ea072294ad7578fc0f064a040fddbae4e154f2e8a33"
+  },
+  "settings": {
+    "batch_size": 64,
+    "image_size": 224,
+    "backbone_lr": 3e-05,
+    "head_lr": 0.001,
+    "weight_decay": 0.05,
+    "warmup_steps": 100,
+    "eval_every": 100,
+    "max_epochs": 10,
+    "patience_epochs": 2,
+    "min_gain_points": 0.5,
+    "relative_threshold": 0.95,
+    "precision": "bfloat16",
+    "drop_last": true
+  },
+  "seed": 0,
+  "source": false,
+  "device": "cuda",
+  "torch_version": "2.14.1+cu130",
+  "train_hash": "eaf1097b0665892d02112c9c7ae37d3d3e904e0e83f1b4b33d7cb6784d1b490c",
+  "test_hash": "c3c7f94076328a100f7fe6774c13a3f20e3413c9191083e0b832f19971be853a"
+}

@@ -1,0 +1,27 @@
+{
+  "version": "domainnet-shared-v1",
+  "manifest_sha256": "bb4f055490231ce42342d18990fa8ec12b9972d09600c358507d1175c48e3aea",
+  "seed": 0,
+  "source_epochs": 10,
+  "settings": {
+    "batch_size": 64,
+    "image_size": 224,
+    "backbone_lr": 3e-05,
+    "head_lr": 0.001,
+    "weight_decay": 0.05,
+    "warmup_steps": 100,
+    "eval_every": 100,
+    "max_epochs": 10,
+    "patience_epochs": 2,
+    "min_gain_points": 0.5,
+    "relative_threshold": 0.95,
+    "precision": "bfloat16",
+    "drop_last": true
+  },
+  "model_repo": "timm/vit_small_patch16_dinov3.lvd1689m",
+  "model_revision": "3bf4720a82ec2066db88137180ff1f83a675cef0",
+  "pretrained_sha256": "2a1ec16ae28ffa07bc0ead0241ee7df9fc26451fe6f9f839b7b3afa0a906b040",
+  "pooling": "avg",
+  "classes": 345,
+  "source_selection": "final_fixed_epoch_weights_without_test_selection"
+}
