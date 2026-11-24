@@ -1,7 +1,4 @@
+results/
+models/
+logs/
 __pycache__/
-*.py[cod]
-.ipynb_checkpoints/
-.venv/
-venv/
-.env
-*.tmp
