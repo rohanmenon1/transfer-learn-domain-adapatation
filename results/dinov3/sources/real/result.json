@@ -1,0 +1,38 @@
+{
+  "job": {
+    "version": "domainnet-shared-v1",
+    "identity": {
+      "initial_sha256": "82626d4b9bd46f05744f4c62a528ae47f12701c6f75d4e0bd600632aa982ce3e",
+      "manifest_sha256": "bb4f055490231ce42342d18990fa8ec12b9972d09600c358507d1175c48e3aea",
+      "domain": "real"
+    },
+    "settings": {
+      "batch_size": 64,
+      "image_size": 224,
+      "backbone_lr": 3e-05,
+      "head_lr": 0.001,
+      "weight_decay": 0.05,
+      "warmup_steps": 100,
+      "eval_every": 100,
+      "max_epochs": 10,
+      "patience_epochs": 2,
+      "min_gain_points": 0.5,
+      "relative_threshold": 0.95,
+      "precision": "bfloat16",
+      "drop_last": true
+    },
+    "seed": 0,
+    "source": true,
+    "device": "cuda",
+    "torch_version": "2.14.1+cu130",
+    "train_hash": "e69ce32565e11c88c0fd4030bfe1c79f07c792ea1fa795c88abc5cd60ccd59fd",
+    "test_hash": "23ad370f03494bd25d8f1d20a11102fe0d65b57217edc6a650abe1bd02fa7953"
+  },
+  "steps": 2680,
+  "steps_per_epoch": 268,
+  "n_train": 17164,
+  "n_test": 2000,
+  "elapsed_seconds": 505.59098150599993,
+  "stopped_by": "fixed_source_budget",
+  "curve": []
+}
