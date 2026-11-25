@@ -1,0 +1,141 @@
+{
+ "args": {
+  "init": "C:\\Users\\Total\\Downloads\\kd_domainnet\\transfer-learn-domain-adapatation\\models\\kd-vitb_dinov3_src-real+sketch_T4_w0.5_s0.pt",
+  "name": null,
+  "target": "quickdraw",
+  "per_class": 50,
+  "max_epochs": 10,
+  "patience": 2,
+  "eval_every": 100,
+  "seed": 0
+ },
+ "name": "kd-vitb_dinov3_src-real+sketch_T4_w0.5_s0",
+ "steps_per_epoch": 269,
+ "plateau": 64.3,
+ "converged_at": 1200,
+ "curve": [
+  [
+   0,
+   15.9
+  ],
+  [
+   100,
+   33.65
+  ],
+  [
+   200,
+   44.7
+  ],
+  [
+   300,
+   50.7
+  ],
+  [
+   400,
+   54.55
+  ],
+  [
+   500,
+   56.5
+  ],
+  [
+   600,
+   57.2
+  ],
+  [
+   700,
+   58.15
+  ],
+  [
+   800,
+   59.85
+  ],
+  [
+   900,
+   60.25
+  ],
+  [
+   1000,
+   60.15
+  ],
+  [
+   1100,
+   59.9
+  ],
+  [
+   1200,
+   61.35
+  ],
+  [
+   1300,
+   61.4
+  ],
+  [
+   1400,
+   62.25
+  ],
+  [
+   1500,
+   62.5
+  ],
+  [
+   1600,
+   62.4
+  ],
+  [
+   1700,
+   62.55
+  ],
+  [
+   1800,
+   63.5
+  ],
+  [
+   1900,
+   63.0
+  ],
+  [
+   2000,
+   63.35
+  ],
+  [
+   2100,
+   62.75
+  ],
+  [
+   2200,
+   63.05
+  ],
+  [
+   2300,
+   63.95
+  ],
+  [
+   2400,
+   64.3
+  ],
+  [
+   2500,
+   63.2
+  ],
+  [
+   2600,
+   63.25
+  ],
+  [
+   2700,
+   63.15
+  ]
+ ],
+ "protocol": "converge.py (fine-tuning branch): 50/class target train, 2000 test images, warm-up 100 then constant lr, eval every 100, stop when last 2 epochs gain < 0.5 pts or 10 epochs, converged_at = first step >= 95% of plateau",
+ "n_train": 17250,
+ "n_test": 2000,
+ "stopped_at": 2700,
+ "init_load": {
+  "loaded": 164,
+  "missing": [],
+  "skipped_shape": [],
+  "unexpected": []
+ },
+ "sec": 1220
+}

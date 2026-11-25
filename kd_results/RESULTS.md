@@ -4,7 +4,8 @@ Adaptation speed of DINOv3 ViT-S models trained with ERM or knowledge distillati
 
 ## Summary
 
-- **Train on two domains (KD, n = 60 runs):** source pairs farther from the target take longer to converge. Within target, ρ = +0.46 (p = 0.001) for the plateau step and +0.72 (p = 0.007) for steps to 95% of final accuracy; pooled over targets, ρ = +0.54 (p = 0.149) and +0.77 (p = 0.028). On quickdraw, every source pair converges late.
+- **Train on two domains, shared protocol (KD, n = 60 runs, Section 5.1):** the median convergence step ranges from 300 (painting) to 1200 (quickdraw). Source pairs farther from the target converge later: within target ρ = +0.48 (p = 0.058), pooled ρ = +0.57 (p = 0.115); a trend, not significant at p < 0.05. They also reach a lower best accuracy (within target ρ = -0.61, p = 0.015).
+- **Train on two domains, earlier protocol (KD, n = 60 runs):** source pairs farther from the target take longer to converge. Within target, ρ = +0.46 (p = 0.001) for the plateau step and +0.72 (p = 0.007) for steps to 95% of final accuracy; pooled over targets, ρ = +0.54 (p = 0.149) and +0.77 (p = 0.028). On quickdraw, every source pair converges late.
 - **Single-source transfer:** KD with a ViT-B teacher differs from ERM in adaptation AUC by +0.11 points on average (higher in 68 of 90 comparisons).
 - **Leave-one-domain-out:** KD with a ViT-B teacher differs from ERM in adaptation AUC by +0.32 points (higher in 18 of 18 comparisons, from 6 models × 3 samples); KD with source-expert teachers by +0.04.
 - **Training on DomainNet sources:** ERM adapts 8.4 AUC points better on average than pretrained DINOv3 without DomainNet training, except on quickdraw, where the pretrained model adapts better.
@@ -25,7 +26,8 @@ Adaptation speed of DINOv3 ViT-S models trained with ERM or knowledge distillati
 | Adaptation test | fine-tune on 10 labelled images per class of the target domain for 500 steps; accuracy on a fixed class-balanced subset of the target test set (20 images per class) |
 | Adaptation metrics | steps to reach 80%, 90% and 95% of the target's in-domain ceiling; AUC = mean accuracy over the 500 steps |
 | Ceiling | in-domain accuracy of DINOv3 ViT-S fine-tuned on the target domain (notes.md) |
-| Repetitions | each model is trained once; adaptation tests in Sections 2.2 and 3 are repeated with 3 different 10-shot samples, those in Sections 2.3 and 5 use one sample |
+| Shared convergence protocol | Section 5.1 only: fine-tune on 50 images per class of the target until accuracy plateaus, as defined by the project's shared protocol (see Section 5.1) |
+| Repetitions | each model is trained once; adaptation tests in Sections 2.2 and 3 are repeated with 3 different 10-shot samples, those in Sections 2.3 and 5.2 use one sample, and each Section 5.1 run is done once |
 
 As a pipeline check, the single-domain ERM model for sketch reaches 67.6% on the sketch test set (finetune.py: 67.5%).
 
@@ -142,7 +144,41 @@ Spearman correlation between distance and adaptation AUC (a negative ρ means th
 
 ## 5. Train on two domains, adapt to each of the other four
 
-A KD student is trained on each of the 15 pairs of source domains (10 epochs over both domains' images); each image is distilled from the single-domain ViT-B teacher of its own domain (T = 4, w = 0.5). Each student is then adapted to each of the four other domains with the adaptation test of Section 1 (one 10-shot sample), giving 60 (source pair, target) runs.
+A KD student is trained on each of the 15 pairs of source domains (10 epochs over both domains' images); each image is distilled from the single-domain ViT-B teacher of its own domain (T = 4, w = 0.5). Each student is then fine-tuned on each of the four other domains, giving 60 (source pair, target) runs.
+
+### 5.1 Shared convergence protocol
+
+Each student is adapted to each of the four other domains with the protocol shared by all methods of the project (`converge.py`; implemented for these models as `kd_converge.py`, which reads the same images from `DOMAINNET_ROOT`):
+
+- **Target training data:** 50 images per class of the target training split (seeded sample, seed 0).
+- **Test data:** 2,000 images drawn at random from the target test split (seed 0), the same for every run on that target.
+- **Fine-tuning:** AdamW (backbone lr 3e-5, head lr 1e-3, weight decay 0.05), batch 64, 224 px, linear warm-up over 100 steps, then a constant learning rate.
+- **Stopping:** accuracy is evaluated every 100 steps; training stops when the best accuracy of the last two epochs is less than 0.5 points above the best accuracy before them, or after 10 epochs.
+- **Convergence step:** the first evaluated step whose accuracy reaches 95% of the run's best accuracy (plateau).
+
+| Target | n | Convergence step (median) | Range | Start accuracy (mean) | Best accuracy (mean) | Ceiling (one domain) | Runs stopped by the 10-epoch cap |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| clipart | 10 | 400 | 300–400 | 59.6 | 77.5 | 77.2 | 0 |
+| infograph | 10 | 500 | 400–600 | 31.4 | 47.4 | 43.1 | 0 |
+| painting | 10 | 300 | 200–400 | 54.9 | 72.8 | 71.7 | 0 |
+| quickdraw | 10 | 1200 | 900–1300 | 13.9 | 64.0 | 63.3 | 7 |
+| real | 10 | 300 | 200–400 | 67.8 | 82.7 | 80.3 | 0 |
+| sketch | 10 | 600 | 300–600 | 52.9 | 69.1 | 67.5 | 0 |
+
+Accuracy in %. Distance of the source pair against the convergence measures (shared OTDD table, tests as in Section 5.2):
+
+| Measure | n | Pooled ρ | p | Within-target ρ | p |
+|---|---|---|---|---|---|
+| convergence step | 60 | +0.57 | 0.115 | +0.48 | 0.058 |
+| best accuracy | 60 | -0.48 | 0.188 | -0.61 | 0.015 |
+
+Because accuracy is evaluated every 100 steps, the convergence steps of the ten source pairs on one target take only two or three distinct values, so the within-target correlation has little resolution and many ties. Runs stopped by the 10-epoch cap were still improving slowly; their convergence step is measured against the best accuracy reached by then.
+
+`converge_kd.csv` has one row per run (source pair, target, distance, convergence step, best and starting accuracy, stopping step); `converge_runs/` has the full accuracy curve of every run.
+
+### 5.2 Earlier protocol (superseded): 10 images per class, 500 steps
+
+Before the project fixed a shared protocol, the same 60 (source pair, target) combinations were measured with the adaptation test of Section 1 (10 labelled images per class, 500 steps, one 10-shot sample). These results are kept for reference; Section 5.1 is the comparable measurement.
 
 - **Convergence:** the plateau step is the first evaluation step after which accuracy stays within 1.5 points of the run's final accuracy, reported as a percentage of the 500 fine-tuning steps. Steps to 95% of the run's final accuracy and AUC are reported as well. Accuracy is evaluated every 10 steps up to step 100 and every 50 steps after that, so step-based values are coarse.
 - **Distance:** shared OTDD table (DINOv3 features of 100 training images per class, noise floor subtracted); the distance of a source pair to a target is the mean of the two sources' distances.
@@ -192,7 +228,8 @@ Accuracy in %. The adaptation test subset (20 images per class) is the one used 
 - Infograph and quickdraw have the lowest ceilings and are also the most distant domains, so the distance correlation partly reflects target difficulty.
 - With six domains, the leave-one-domain-out analysis has n = 6 per method. Paired comparisons that reuse the same trained model (several targets or 10-shot samples) are not independent, so counts such as "higher in 18 of 18" overstate the evidence if read as independent trials.
 - KD and ERM students train for the same number of steps on the same images, but KD additionally requires training the ViT-B teacher, so its total compute is higher.
-- Section 5 has KD students only, one 10-shot sample per run, and no ERM model trained on the same source pairs, so it describes how distance relates to convergence for KD but does not compare methods.
+- Section 5 has KD students only and one run per (source pair, target), so it describes how distance relates to convergence for KD; comparisons with other methods use the shared protocol of Section 5.1.
+- In Section 5.1, each method draws its own 2,000 test images, so accuracy differences of about one point between methods are within sampling noise (standard error about 1 point at 70% accuracy).
 
 ## Reproducing these results
 
@@ -204,7 +241,7 @@ python kd_run_all.py             # run everything (resumable); logs in logs/kd/
 python kd_report.py              # rebuild kd_results/RESULTS.md and the figures
 ```
 
-Single jobs can be run directly, e.g. `python kd_train.py src-student --domain sketch` or `python kd_adapt.py --init models/expert_dinov3_real_s0.pt --target sketch`. Approximate cost on one RTX 3080 Laptop GPU (8 GB): about 25 GPU-hours for the single-source experiments (Sections 2.1-2.2), about 5 GPU-hours for the KD hyperparameter sweep (Section 2.3), about 28 GPU-hours for leave-one-domain-out (Section 3), about 14 GPU-hours for the two-source experiments (Section 5) and about 2 GPU-hours for the reference model (Section 6).
+Single jobs can be run directly, e.g. `python kd_train.py src-student --domain sketch` or `python kd_adapt.py --init models/expert_dinov3_real_s0.pt --target sketch`. The shared convergence protocol of Section 5.1 runs one (model, target) pair at a time, e.g. `python kd_converge.py --init models/kd-vitb_dinov3_src-clipart+infograph_T4_w0.5_s0.pt --target painting` (about 11 GPU-hours for all 60 runs). Approximate cost on one RTX 3080 Laptop GPU (8 GB): about 25 GPU-hours for the single-source experiments (Sections 2.1-2.2), about 5 GPU-hours for the KD hyperparameter sweep (Section 2.3), about 28 GPU-hours for leave-one-domain-out (Section 3), about 14 GPU-hours for the two-source experiments (Section 5) and about 2 GPU-hours for the reference model (Section 6).
 
 ## Figures
 
@@ -212,6 +249,7 @@ Single jobs can be run directly, e.g. `python kd_train.py src-student --domain s
 - **fig2_lodo_heldout_accuracy** (`fig2_lodo_heldout_accuracy.png`, `fig2_lodo_heldout_accuracy.svg`): Accuracy on the held-out domain before adaptation. Dashed lines mark the in-domain ceiling. Each model was trained once.
 - **fig3_lodo_adaptation_curves** (`fig3_lodo_adaptation_curves.png`, `fig3_lodo_adaptation_curves.svg`): Accuracy on the held-out domain during fine-tuning, one panel per held-out domain. The dashed line marks 90% of the in-domain ceiling.
 - **fig4_distance_vs_adaptation** (`fig4_distance_vs_adaptation.png`, `fig4_distance_vs_adaptation.svg`): Adaptation AUC against OTDD. Left: one point per (source, target) pair. Right: one point per held-out domain and starting model; points are offset horizontally by up to 0.05 so that overlapping methods stay visible.
+- **fig7_pairs_converge_curves** (`fig7_pairs_converge_curves.png`, `fig7_pairs_converge_curves.svg`): Accuracy on the target test images (2,000) during fine-tuning under the shared protocol, one line per source pair; dots mark the convergence step.
 - **fig5_pairs_distance_vs_plateau** (`fig5_pairs_distance_vs_plateau.png`, `fig5_pairs_distance_vs_plateau.svg`): One point per (source pair, target) run: distance against the share of fine-tuning completed when accuracy settles within 1.5 points of its final value.
 - **fig6_pairs_by_target** (`fig6_pairs_by_target.png`, `fig6_pairs_by_target.svg`): The runs of fig5 split by target domain; each panel compares the ten source pairs on the same target, so target difficulty is held fixed.
 

@@ -178,8 +178,11 @@ def setup_section(R):
         ("Adaptation metrics", "steps to reach 80%, 90% and 95% of the target's in-domain ceiling; "
                                "AUC = mean accuracy over the 500 steps"),
         ("Ceiling", "in-domain accuracy of DINOv3 ViT-S fine-tuned on the target domain (notes.md)"),
+        ("Shared convergence protocol", "Section 5.1 only: fine-tune on 50 images per class of the target until "
+                                        "accuracy plateaus, as defined by the project's shared protocol (see Section 5.1)"),
         ("Repetitions", "each model is trained once; adaptation tests in Sections 2.2 and 3 are repeated with 3 "
-                        "different 10-shot samples, those in Sections 2.3 and 5 use one sample"),
+                        "different 10-shot samples, those in Sections 2.3 and 5.2 use one sample, and each "
+                        "Section 5.1 run is done once"),
     ]
     return ["## 1. Experimental setup", ""] + table(["Item", "Setting"], rows, numeric=False) + ["", check.strip(), ""]
 
@@ -436,12 +439,24 @@ def distance_section(R, out, figs):
     return md, res
 
 
-def summary_section(R, ss_d, lodo_d, dres, pres=None):
+def summary_section(R, ss_d, lodo_d, dres, pres=None, cres=None):
     lines = ["## Summary", ""]
+    if cres:
+        T, rows = cres
+        c, pa = T["converged_at"], T["plateau_acc"]
+        med = {t: np.median([r["converged_at"] for r in rows if r["target"] == t]) for t in D}
+        order = sorted((t for t in D if not np.isnan(med[t])), key=lambda t: med[t])
+        sig = "significant" if c["p_within"] < 0.05 else "a trend, not significant at p < 0.05"
+        lines.append(f"- **Train on two domains, shared protocol (KD, n = {len(rows)} runs, Section 5.1):** the "
+                     f"median convergence step ranges from {med[order[0]]:.0f} ({order[0]}) to "
+                     f"{med[order[-1]]:.0f} ({order[-1]}). Source pairs farther from the target converge later: "
+                     f"within target ρ = {c['within']:+.2f} (p = {pval(c['p_within'])}), pooled ρ = "
+                     f"{c['pooled']:+.2f} (p = {pval(c['p_pooled'])}); {sig}. They also reach a lower best "
+                     f"accuracy (within target ρ = {pa['within']:+.2f}, p = {pval(pa['p_within'])}).")
     if pres:
         T, rows = pres
         p, s95 = T["plateau_pct"], T["steps_to_95pct_final"]
-        lines.append(f"- **Train on two domains (KD, n = {len(rows)} runs):** source pairs farther from the target "
+        lines.append(f"- **Train on two domains, earlier protocol (KD, n = {len(rows)} runs):** source pairs farther from the target "
                      f"take longer to converge. Within target, ρ = {p['within']:+.2f} (p = {pval(p['p_within'])}) "
                      f"for the plateau step and {s95['within']:+.2f} (p = {pval(s95['p_within'])}) for steps to 95% "
                      f"of final accuracy; pooled over targets, ρ = {p['pooled']:+.2f} (p = {pval(p['p_pooled'])}) "
@@ -528,12 +543,112 @@ def pair_tests(rows, key, dist):
             "within": within, "p_within": float((np.abs(null[:, 1]) >= abs(within) - 1e-12).mean()), "per": per}
 
 
+CONVERGE_NAME = "converge_kd-vitb_dinov3_src-{}+{}_T4_w0.5_s0_to-{}"
+
+
+def converge_rows(R):
+    rows, runs = [], {}
+    for a, b in PAIRS:
+        for t in D:
+            if t in (a, b):
+                continue
+            r = load(R.res / f"{CONVERGE_NAME.format(a, b, t)}.json")
+            if not r:
+                continue
+            runs[(a, b, t)] = r
+            rows.append({"source_a": a, "source_b": b, "target": t,
+                         "otdd": round((TEAM_OTDD[a][t] + TEAM_OTDD[b][t]) / 2, 3),
+                         "converged_at": r["converged_at"], "plateau_acc": round(r["plateau"], 2),
+                         "start_acc": round(r["curve"][0][1], 2), "stopped_at": r["stopped_at"],
+                         "hit_epoch_cap": r["stopped_at"] >= r["args"]["max_epochs"] * r["steps_per_epoch"],
+                         "steps_per_epoch": r["steps_per_epoch"]})
+    return rows, runs
+
+
+def converge_section(R, out, figs):
+    md = ["### 5.1 Shared convergence protocol", "",
+          "Each student is adapted to each of the four other domains with the protocol shared by all methods of "
+          "the project (`converge.py`; implemented for these models as `kd_converge.py`, which reads the same "
+          "images from `DOMAINNET_ROOT`):", "",
+          "- **Target training data:** 50 images per class of the target training split (seeded sample, seed 0).",
+          "- **Test data:** 2,000 images drawn at random from the target test split (seed 0), the same for every "
+          "run on that target.",
+          "- **Fine-tuning:** AdamW (backbone lr 3e-5, head lr 1e-3, weight decay 0.05), batch 64, 224 px, "
+          "linear warm-up over 100 steps, then a constant learning rate.",
+          "- **Stopping:** accuracy is evaluated every 100 steps; training stops when the best accuracy of the "
+          "last two epochs is less than 0.5 points above the best accuracy before them, or after 10 epochs.",
+          "- **Convergence step:** the first evaluated step whose accuracy reaches 95% of the run's best "
+          "accuracy (plateau).", ""]
+    rows, runs = converge_rows(R)
+    if len(rows) < 12:
+        return md + [f"Pending: {len(rows)} of 60 runs complete.", ""], None
+    with open(out / "converge_kd.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    raw = out / "converge_runs"
+    raw.mkdir(exist_ok=True)
+    for (a, b, t), r in runs.items():
+        (raw / f"{CONVERGE_NAME.format(a, b, t)}.json").write_text(json.dumps(r, indent=1), encoding="utf-8")
+
+    prow = []
+    for t in D:
+        sub = [r for r in rows if r["target"] == t]
+        if sub:
+            c = [r["converged_at"] for r in sub]
+            prow.append([t, len(sub), f"{np.median(c):.0f}", f"{min(c)}–{max(c)}",
+                         f"{np.mean([r['start_acc'] for r in sub]):.1f}",
+                         f"{np.mean([r['plateau_acc'] for r in sub]):.1f}", f"{CEILING[t]:.1f}",
+                         sum(r["hit_epoch_cap"] for r in sub)])
+    md += table(["Target", "n", "Convergence step (median)", "Range", "Start accuracy (mean)",
+                 "Best accuracy (mean)", "Ceiling (one domain)", "Runs stopped by the 10-epoch cap"], prow)
+    T = {}
+    trows = []
+    for key, lab in (("converged_at", "convergence step"), ("plateau_acc", "best accuracy")):
+        T[key] = s = pair_tests(rows, key, TEAM_OTDD)
+        trows.append([lab, len(rows), f"{s['pooled']:+.2f}", pval(s["p_pooled"]), f"{s['within']:+.2f}",
+                      pval(s["p_within"])])
+    md += ["", "Accuracy in %. Distance of the source pair against the convergence measures (shared OTDD table, "
+               "tests as in Section 5.2):", ""]
+    md += table(["Measure", "n", "Pooled ρ", "p", "Within-target ρ", "p"], trows, numeric=False)
+    md += ["", "Because accuracy is evaluated every 100 steps, the convergence steps of the ten source pairs on one "
+               "target take only two or three distinct values, so the within-target correlation has little "
+               "resolution and many ties. Runs stopped by the 10-epoch cap were still improving slowly; their "
+               "convergence step is measured against the best accuracy reached by then.", "",
+           "`converge_kd.csv` has one row per run (source pair, target, distance, convergence step, best and "
+           "starting accuracy, stopping step); `converge_runs/` has the full accuracy curve of every run.", ""]
+
+    fig, axs = plt.subplots(2, 3, figsize=(17, 9.5), sharex=True, sharey=True)
+    for ax, t in zip(axs.flat, D):
+        for k, (a, b) in enumerate(p for p in PAIRS if t not in p):
+            r = runs.get((a, b, t))
+            if not r:
+                continue
+            s, acc = zip(*r["curve"])
+            ax.plot(s, acc, color=f"C{k}", lw=1.6, label=f"{a}+{b}")
+            ax.plot(r["converged_at"], dict(r["curve"])[r["converged_at"]], "o", color=f"C{k}", ms=6,
+                    markeredgecolor="white", markeredgewidth=1)
+        ax.set_title(f"Target: {t}", loc="left")
+        ax.legend(fontsize=7.5, loc="lower right", title="Source pair", title_fontsize=7.5)
+    for ax in axs[1]:
+        ax.set_xlabel("Fine-tuning steps on the target (batch 64)")
+    for ax in axs[:, 0]:
+        ax.set_ylabel("Target test accuracy (%)")
+    fig.suptitle("Train on two domains (KD), shared convergence protocol: accuracy on the target during "
+                 "fine-tuning\nDots mark the convergence step (first evaluation at ≥ 95% of the run's best accuracy)",
+                 x=0.01, ha="left", fontweight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    save(fig, out, "fig7_pairs_converge_curves")
+    figs.append(("fig7_pairs_converge_curves", "Accuracy on the target test images (2,000) during fine-tuning "
+                 "under the shared protocol, one line per source pair; dots mark the convergence step."))
+    return md, (T, rows)
+
+
 def pairs_section(R, out, figs):
-    md = ["## 5. Train on two domains, adapt to each of the other four", "",
-          "A KD student is trained on each of the 15 pairs of source domains (10 epochs over both domains' images); "
-          "each image is distilled from the single-domain ViT-B teacher of its own domain (T = 4, w = 0.5). Each "
-          "student is then adapted to each of the four other domains with the adaptation test of Section 1 (one "
-          "10-shot sample), giving 60 (source pair, target) runs.", "",
+    md = ["### 5.2 Earlier protocol (superseded): 10 images per class, 500 steps", "",
+          "Before the project fixed a shared protocol, the same 60 (source pair, target) combinations were measured "
+          "with the adaptation test of Section 1 (10 labelled images per class, 500 steps, one 10-shot sample). "
+          "These results are kept for reference; Section 5.1 is the comparable measurement.", "",
           "- **Convergence:** the plateau step is the first evaluation step after which accuracy stays within "
           f"{PLATEAU_TOL} points of the run's final accuracy, reported as a percentage of the 500 fine-tuning steps. "
           "Steps to 95% of the run's final accuracy and AUC are reported as well. Accuracy is evaluated every 10 "
@@ -659,8 +774,10 @@ LIMITATIONS = [
     "\"higher in 18 of 18\" overstate the evidence if read as independent trials.",
     "- KD and ERM students train for the same number of steps on the same images, but KD additionally requires "
     "training the ViT-B teacher, so its total compute is higher.",
-    "- Section 5 has KD students only, one 10-shot sample per run, and no ERM model trained on the same source "
-    "pairs, so it describes how distance relates to convergence for KD but does not compare methods.", ""]
+    "- Section 5 has KD students only and one run per (source pair, target), so it describes how distance "
+    "relates to convergence for KD; comparisons with other methods use the shared protocol of Section 5.1.",
+    "- In Section 5.1, each method draws its own 2,000 test images, so accuracy differences of about one point "
+    "between methods are within sampling noise (standard error about 1 point at 70% accuracy).", ""]
 
 REPRODUCE = [
     "## Reproducing these results", "",
@@ -672,7 +789,10 @@ REPRODUCE = [
     "python kd_report.py              # rebuild kd_results/RESULTS.md and the figures",
     "```", "",
     "Single jobs can be run directly, e.g. `python kd_train.py src-student --domain sketch` or "
-    "`python kd_adapt.py --init models/expert_dinov3_real_s0.pt --target sketch`. "
+    "`python kd_adapt.py --init models/expert_dinov3_real_s0.pt --target sketch`. The shared convergence "
+    "protocol of Section 5.1 runs one (model, target) pair at a time, e.g. "
+    "`python kd_converge.py --init models/kd-vitb_dinov3_src-clipart+infograph_T4_w0.5_s0.pt --target painting` "
+    "(about 11 GPU-hours for all 60 runs). "
     "Approximate cost on one RTX 3080 Laptop GPU (8 GB): about 25 GPU-hours for the single-source experiments "
     "(Sections 2.1-2.2), about 5 GPU-hours for the KD hyperparameter sweep (Section 2.3), about 28 GPU-hours "
     "for leave-one-domain-out (Section 3), about 14 GPU-hours for the two-source experiments (Section 5) and "
@@ -692,12 +812,18 @@ def main():
     ss_md, ss_d = single_source_section(R, a.out, figs)
     lodo_md, lodo_d = lodo_section(R, a.out, figs)
     dist_md, dres = distance_section(R, a.out, figs)
+    conv_md, cres = converge_section(R, a.out, figs)
     pairs_md, pres = pairs_section(R, a.out, figs)
+    pairs_md = ["## 5. Train on two domains, adapt to each of the other four", "",
+                "A KD student is trained on each of the 15 pairs of source domains (10 epochs over both domains' "
+                "images); each image is distilled from the single-domain ViT-B teacher of its own domain (T = 4, "
+                "w = 0.5). Each student is then fine-tuned on each of the four other domains, giving 60 (source "
+                "pair, target) runs.", ""] + conv_md + pairs_md
     ref_md = reference_section(R, pres)
     md = ["# Knowledge distillation and ERM on DomainNet", "",
           "Adaptation speed of DINOv3 ViT-S models trained with ERM or knowledge distillation (KD), measured as "
           "accuracy on a new domain during few-shot fine-tuning.", ""]
-    md += (summary_section(R, ss_d, lodo_d, dres, pres) + setup_section(R) + ss_md + lodo_md + dist_md + pairs_md
+    md += (summary_section(R, ss_d, lodo_d, dres, pres, cres) + setup_section(R) + ss_md + lodo_md + dist_md + pairs_md
            + ref_md + LIMITATIONS + REPRODUCE)
     if figs:
         md += ["## Figures", ""] + [f"- **{n}** (`{n}.png`, `{n}.svg`): {c}" for n, c in figs] + [""]

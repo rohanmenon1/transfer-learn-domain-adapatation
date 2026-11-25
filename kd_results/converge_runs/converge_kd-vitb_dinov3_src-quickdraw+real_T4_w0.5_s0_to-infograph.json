@@ -1,0 +1,93 @@
+{
+ "args": {
+  "init": "C:\\Users\\Total\\Downloads\\kd_domainnet\\transfer-learn-domain-adapatation\\models\\kd-vitb_dinov3_src-quickdraw+real_T4_w0.5_s0.pt",
+  "name": null,
+  "target": "infograph",
+  "per_class": 50,
+  "max_epochs": 10,
+  "patience": 2,
+  "eval_every": 100,
+  "seed": 0
+ },
+ "name": "kd-vitb_dinov3_src-quickdraw+real_T4_w0.5_s0",
+ "steps_per_epoch": 230,
+ "plateau": 46.55,
+ "converged_at": 500,
+ "curve": [
+  [
+   0,
+   28.9
+  ],
+  [
+   100,
+   38.9
+  ],
+  [
+   200,
+   40.45
+  ],
+  [
+   300,
+   41.65
+  ],
+  [
+   400,
+   43.65
+  ],
+  [
+   500,
+   44.5
+  ],
+  [
+   600,
+   44.85
+  ],
+  [
+   700,
+   45.4
+  ],
+  [
+   800,
+   45.85
+  ],
+  [
+   900,
+   45.6
+  ],
+  [
+   1000,
+   46.55
+  ],
+  [
+   1100,
+   45.15
+  ],
+  [
+   1200,
+   46.0
+  ],
+  [
+   1300,
+   45.45
+  ],
+  [
+   1400,
+   46.0
+  ],
+  [
+   1500,
+   46.5
+  ]
+ ],
+ "protocol": "converge.py (fine-tuning branch): 50/class target train, 2000 test images, warm-up 100 then constant lr, eval every 100, stop when last 2 epochs gain < 0.5 pts or 10 epochs, converged_at = first step >= 95% of plateau",
+ "n_train": 14732,
+ "n_test": 2000,
+ "stopped_at": 1500,
+ "init_load": {
+  "loaded": 164,
+  "missing": [],
+  "skipped_shape": [],
+  "unexpected": []
+ },
+ "sec": 740
+}

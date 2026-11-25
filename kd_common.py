@@ -50,7 +50,7 @@ PER_CLASS, SAMPLE_SEED, VIEW_SEED, BIG = 50, 0, 0, 10_000_000
 BATCH, EVAL_BATCH = 64, 256
 EXPERT_EPOCHS = 10   # single-domain training, as in finetune.py
 LODO_STEPS = 5000    # multi-source training length (DomainBed default, Gulrajani & Lopez-Paz 2021)
-WORKERS = 2 if SMOKE else 6  # more workers ran out of memory on an 8 GB GPU machine
+WORKERS = int(os.environ.get("KD_WORKERS", 2 if SMOKE else 6))  # more workers ran out of memory on an 8 GB GPU machine
 MEAN = torch.tensor((0.485, 0.456, 0.406)).view(1, 3, 1, 1)
 STD = torch.tensor((0.229, 0.224, 0.225)).view(1, 3, 1, 1)
 # same ops as common.TRAIN_TF / TEST_TF, but returning uint8 (normalised on the GPU)
