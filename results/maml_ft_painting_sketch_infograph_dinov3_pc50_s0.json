@@ -1,0 +1,82 @@
+{
+  "args": {
+    "experiment": "painting_sketch",
+    "backbone": "dinov3",
+    "maml_checkpoint": "models\\maml_painting_sketch.pt",
+    "targets": [
+      "infograph"
+    ],
+    "per_class": 50,
+    "epochs": 10,
+    "batch_size": 64,
+    "lr": 3e-05,
+    "head_lr": 0.001,
+    "weight_decay": 0.05,
+    "seed": 0
+  },
+  "domain": "infograph",
+  "initial_accuracy": 0.001,
+  "final_accuracy": 0.4565,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 5.287939726788065,
+      "train_accuracy": 0.1265625,
+      "test_accuracy": 0.2215
+    },
+    {
+      "epoch": 2,
+      "train_loss": 3.4028910377751225,
+      "train_accuracy": 0.3340353260869565,
+      "test_accuracy": 0.3745
+    },
+    {
+      "epoch": 3,
+      "train_loss": 2.551116420393405,
+      "train_accuracy": 0.4733016304347826,
+      "test_accuracy": 0.4325
+    },
+    {
+      "epoch": 4,
+      "train_loss": 2.104709568231002,
+      "train_accuracy": 0.5567934782608696,
+      "test_accuracy": 0.437
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.8076131706652434,
+      "train_accuracy": 0.60625,
+      "test_accuracy": 0.45
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.5637674124344536,
+      "train_accuracy": 0.6566576086956522,
+      "test_accuracy": 0.462
+    },
+    {
+      "epoch": 7,
+      "train_loss": 1.3474809913531594,
+      "train_accuracy": 0.6986413043478261,
+      "test_accuracy": 0.4595
+    },
+    {
+      "epoch": 8,
+      "train_loss": 1.1854728815348252,
+      "train_accuracy": 0.7386548913043478,
+      "test_accuracy": 0.4615
+    },
+    {
+      "epoch": 9,
+      "train_loss": 1.0212234725122866,
+      "train_accuracy": 0.7753396739130435,
+      "test_accuracy": 0.4615
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.8857106615667758,
+      "train_accuracy": 0.8107336956521739,
+      "test_accuracy": 0.4565
+    }
+  ]
+}

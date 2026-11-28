@@ -1,0 +1,482 @@
+[
+  {
+    "source_1": "clipart",
+    "source_2": "infograph",
+    "target": "painting",
+    "initial_accuracy": 0.0045,
+    "final_accuracy": 0.7185,
+    "improvement": 0.7140000000000001
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "infograph",
+    "target": "quickdraw",
+    "initial_accuracy": 0.006,
+    "final_accuracy": 0.633,
+    "improvement": 0.627
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "infograph",
+    "target": "real",
+    "initial_accuracy": 0.0025,
+    "final_accuracy": 0.7965,
+    "improvement": 0.794
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "infograph",
+    "target": "sketch",
+    "initial_accuracy": 0.001,
+    "final_accuracy": 0.66,
+    "improvement": 0.659
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "painting",
+    "target": "infograph",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.4535,
+    "improvement": 0.452
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "painting",
+    "target": "quickdraw",
+    "initial_accuracy": 0.004,
+    "final_accuracy": 0.6345,
+    "improvement": 0.6305
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "painting",
+    "target": "real",
+    "initial_accuracy": 0.003,
+    "final_accuracy": 0.8005,
+    "improvement": 0.7975
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "painting",
+    "target": "sketch",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.668,
+    "improvement": 0.6665000000000001
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "quickdraw",
+    "target": "infograph",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.4635,
+    "improvement": 0.462
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "quickdraw",
+    "target": "painting",
+    "initial_accuracy": 0.005,
+    "final_accuracy": 0.711,
+    "improvement": 0.706
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "quickdraw",
+    "target": "real",
+    "initial_accuracy": 0.0025,
+    "final_accuracy": 0.804,
+    "improvement": 0.8015000000000001
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "quickdraw",
+    "target": "sketch",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.665,
+    "improvement": 0.6635000000000001
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "real",
+    "target": "infograph",
+    "initial_accuracy": 0.002,
+    "final_accuracy": 0.449,
+    "improvement": 0.447
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "real",
+    "target": "painting",
+    "initial_accuracy": 0.005,
+    "final_accuracy": 0.715,
+    "improvement": 0.71
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "real",
+    "target": "quickdraw",
+    "initial_accuracy": 0.0055,
+    "final_accuracy": 0.637,
+    "improvement": 0.6315000000000001
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "real",
+    "target": "sketch",
+    "initial_accuracy": 0.002,
+    "final_accuracy": 0.6635,
+    "improvement": 0.6615
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "sketch",
+    "target": "infograph",
+    "initial_accuracy": 0.001,
+    "final_accuracy": 0.459,
+    "improvement": 0.458
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "sketch",
+    "target": "painting",
+    "initial_accuracy": 0.005,
+    "final_accuracy": 0.716,
+    "improvement": 0.711
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "sketch",
+    "target": "quickdraw",
+    "initial_accuracy": 0.005,
+    "final_accuracy": 0.632,
+    "improvement": 0.627
+  },
+  {
+    "source_1": "clipart",
+    "source_2": "sketch",
+    "target": "real",
+    "initial_accuracy": 0.0025,
+    "final_accuracy": 0.8035,
+    "improvement": 0.801
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "painting",
+    "target": "clipart",
+    "initial_accuracy": 0.0025,
+    "final_accuracy": 0.764,
+    "improvement": 0.7615000000000001
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "painting",
+    "target": "quickdraw",
+    "initial_accuracy": 0.005,
+    "final_accuracy": 0.6335,
+    "improvement": 0.6285
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "painting",
+    "target": "real",
+    "initial_accuracy": 0.0035,
+    "final_accuracy": 0.806,
+    "improvement": 0.8025000000000001
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "painting",
+    "target": "sketch",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.6655,
+    "improvement": 0.664
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "quickdraw",
+    "target": "clipart",
+    "initial_accuracy": 0.0035,
+    "final_accuracy": 0.765,
+    "improvement": 0.7615000000000001
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "quickdraw",
+    "target": "painting",
+    "initial_accuracy": 0.0035,
+    "final_accuracy": 0.7125,
+    "improvement": 0.7090000000000001
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "quickdraw",
+    "target": "real",
+    "initial_accuracy": 0.0035,
+    "final_accuracy": 0.8035,
+    "improvement": 0.8
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "quickdraw",
+    "target": "sketch",
+    "initial_accuracy": 0.003,
+    "final_accuracy": 0.6625,
+    "improvement": 0.6595
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "real",
+    "target": "clipart",
+    "initial_accuracy": 0.0025,
+    "final_accuracy": 0.762,
+    "improvement": 0.7595000000000001
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "real",
+    "target": "painting",
+    "initial_accuracy": 0.0035,
+    "final_accuracy": 0.721,
+    "improvement": 0.7175
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "real",
+    "target": "quickdraw",
+    "initial_accuracy": 0.0035,
+    "final_accuracy": 0.634,
+    "improvement": 0.6305000000000001
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "real",
+    "target": "sketch",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.665,
+    "improvement": 0.6635000000000001
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "sketch",
+    "target": "clipart",
+    "initial_accuracy": 0.0045,
+    "final_accuracy": 0.7665,
+    "improvement": 0.762
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "sketch",
+    "target": "painting",
+    "initial_accuracy": 0.005,
+    "final_accuracy": 0.7255,
+    "improvement": 0.7205
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "sketch",
+    "target": "quickdraw",
+    "initial_accuracy": 0.0055,
+    "final_accuracy": 0.634,
+    "improvement": 0.6285000000000001
+  },
+  {
+    "source_1": "infograph",
+    "source_2": "sketch",
+    "target": "real",
+    "initial_accuracy": 0.0025,
+    "final_accuracy": 0.803,
+    "improvement": 0.8005000000000001
+  },
+  {
+    "source_1": "painting",
+    "source_2": "quickdraw",
+    "target": "clipart",
+    "initial_accuracy": 0.002,
+    "final_accuracy": 0.7655,
+    "improvement": 0.7635
+  },
+  {
+    "source_1": "painting",
+    "source_2": "quickdraw",
+    "target": "infograph",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.4545,
+    "improvement": 0.453
+  },
+  {
+    "source_1": "painting",
+    "source_2": "quickdraw",
+    "target": "real",
+    "initial_accuracy": 0.0025,
+    "final_accuracy": 0.8045,
+    "improvement": 0.802
+  },
+  {
+    "source_1": "painting",
+    "source_2": "quickdraw",
+    "target": "sketch",
+    "initial_accuracy": 0.002,
+    "final_accuracy": 0.6645,
+    "improvement": 0.6625
+  },
+  {
+    "source_1": "painting",
+    "source_2": "real",
+    "target": "clipart",
+    "initial_accuracy": 0.0025,
+    "final_accuracy": 0.764,
+    "improvement": 0.7615000000000001
+  },
+  {
+    "source_1": "painting",
+    "source_2": "real",
+    "target": "infograph",
+    "initial_accuracy": 0.0005,
+    "final_accuracy": 0.4535,
+    "improvement": 0.453
+  },
+  {
+    "source_1": "painting",
+    "source_2": "real",
+    "target": "quickdraw",
+    "initial_accuracy": 0.0035,
+    "final_accuracy": 0.636,
+    "improvement": 0.6325000000000001
+  },
+  {
+    "source_1": "painting",
+    "source_2": "real",
+    "target": "sketch",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.658,
+    "improvement": 0.6565000000000001
+  },
+  {
+    "source_1": "painting",
+    "source_2": "sketch",
+    "target": "clipart",
+    "initial_accuracy": 0.0035,
+    "final_accuracy": 0.758,
+    "improvement": 0.7545000000000001
+  },
+  {
+    "source_1": "painting",
+    "source_2": "sketch",
+    "target": "infograph",
+    "initial_accuracy": 0.001,
+    "final_accuracy": 0.4565,
+    "improvement": 0.4555
+  },
+  {
+    "source_1": "painting",
+    "source_2": "sketch",
+    "target": "quickdraw",
+    "initial_accuracy": 0.0045,
+    "final_accuracy": 0.6335,
+    "improvement": 0.629
+  },
+  {
+    "source_1": "painting",
+    "source_2": "sketch",
+    "target": "real",
+    "initial_accuracy": 0.003,
+    "final_accuracy": 0.7995,
+    "improvement": 0.7965
+  },
+  {
+    "source_1": "quickdraw",
+    "source_2": "real",
+    "target": "clipart",
+    "initial_accuracy": 0.002,
+    "final_accuracy": 0.764,
+    "improvement": 0.762
+  },
+  {
+    "source_1": "quickdraw",
+    "source_2": "real",
+    "target": "infograph",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.452,
+    "improvement": 0.4505
+  },
+  {
+    "source_1": "quickdraw",
+    "source_2": "real",
+    "target": "painting",
+    "initial_accuracy": 0.0055,
+    "final_accuracy": 0.7135,
+    "improvement": 0.7080000000000001
+  },
+  {
+    "source_1": "quickdraw",
+    "source_2": "real",
+    "target": "sketch",
+    "initial_accuracy": 0.002,
+    "final_accuracy": 0.665,
+    "improvement": 0.663
+  },
+  {
+    "source_1": "quickdraw",
+    "source_2": "sketch",
+    "target": "clipart",
+    "initial_accuracy": 0.002,
+    "final_accuracy": 0.766,
+    "improvement": 0.764
+  },
+  {
+    "source_1": "quickdraw",
+    "source_2": "sketch",
+    "target": "infograph",
+    "initial_accuracy": 0.0015,
+    "final_accuracy": 0.4565,
+    "improvement": 0.455
+  },
+  {
+    "source_1": "quickdraw",
+    "source_2": "sketch",
+    "target": "painting",
+    "initial_accuracy": 0.0055,
+    "final_accuracy": 0.7245,
+    "improvement": 0.7190000000000001
+  },
+  {
+    "source_1": "quickdraw",
+    "source_2": "sketch",
+    "target": "real",
+    "initial_accuracy": 0.0025,
+    "final_accuracy": 0.8045,
+    "improvement": 0.802
+  },
+  {
+    "source_1": "real",
+    "source_2": "sketch",
+    "target": "clipart",
+    "initial_accuracy": 0.0035,
+    "final_accuracy": 0.7635,
+    "improvement": 0.76
+  },
+  {
+    "source_1": "real",
+    "source_2": "sketch",
+    "target": "infograph",
+    "initial_accuracy": 0.002,
+    "final_accuracy": 0.4565,
+    "improvement": 0.4545
+  },
+  {
+    "source_1": "real",
+    "source_2": "sketch",
+    "target": "painting",
+    "initial_accuracy": 0.0045,
+    "final_accuracy": 0.7205,
+    "improvement": 0.7160000000000001
+  },
+  {
+    "source_1": "real",
+    "source_2": "sketch",
+    "target": "quickdraw",
+    "initial_accuracy": 0.0065,
+    "final_accuracy": 0.6385,
+    "improvement": 0.632
+  }
+]

@@ -1,4 +1,5 @@
-results/
+results/*
+!results/*.json
 models/
 logs/
 __pycache__/

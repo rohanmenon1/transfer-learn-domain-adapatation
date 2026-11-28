@@ -1,0 +1,2772 @@
+{
+  "args": {
+    "backbone": "dinov3",
+    "domains": [
+      "infograph",
+      "sketch"
+    ],
+    "n_way": 5,
+    "k_shot": 5,
+    "q_query": 5,
+    "inner_steps": 1,
+    "inner_lr": 0.001,
+    "meta_lr": 1e-06,
+    "episodes": 550,
+    "meta_batch": 4,
+    "per_class": 50,
+    "seed": 0,
+    "output": "maml_infograph_sketch"
+  },
+  "history": [
+    {
+      "episode": 1,
+      "meta_loss": 1.6089613139629364,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 2,
+      "meta_loss": 1.6089971959590912,
+      "query_accuracy": 0.6399999782443047
+    },
+    {
+      "episode": 3,
+      "meta_loss": 1.60898095369339,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 4,
+      "meta_loss": 1.6089143753051758,
+      "query_accuracy": 0.6799999848008156
+    },
+    {
+      "episode": 5,
+      "meta_loss": 1.6089958548545837,
+      "query_accuracy": 0.5899999812245369
+    },
+    {
+      "episode": 6,
+      "meta_loss": 1.6089591979980469,
+      "query_accuracy": 0.6099999770522118
+    },
+    {
+      "episode": 7,
+      "meta_loss": 1.6091328263282776,
+      "query_accuracy": 0.5299999937415123
+    },
+    {
+      "episode": 8,
+      "meta_loss": 1.608931064605713,
+      "query_accuracy": 0.6499999836087227
+    },
+    {
+      "episode": 9,
+      "meta_loss": 1.608995795249939,
+      "query_accuracy": 0.6099999994039536
+    },
+    {
+      "episode": 10,
+      "meta_loss": 1.608971893787384,
+      "query_accuracy": 0.6199999749660492
+    },
+    {
+      "episode": 11,
+      "meta_loss": 1.6088135540485382,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 12,
+      "meta_loss": 1.6088971495628357,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 13,
+      "meta_loss": 1.6086949706077576,
+      "query_accuracy": 0.8399999737739563
+    },
+    {
+      "episode": 14,
+      "meta_loss": 1.608733206987381,
+      "query_accuracy": 0.8299999833106995
+    },
+    {
+      "episode": 15,
+      "meta_loss": 1.6089901626110077,
+      "query_accuracy": 0.5999999940395355
+    },
+    {
+      "episode": 16,
+      "meta_loss": 1.6089882552623749,
+      "query_accuracy": 0.5799999907612801
+    },
+    {
+      "episode": 17,
+      "meta_loss": 1.6090660989284515,
+      "query_accuracy": 0.549999974668026
+    },
+    {
+      "episode": 18,
+      "meta_loss": 1.6087583601474762,
+      "query_accuracy": 0.8099999874830246
+    },
+    {
+      "episode": 19,
+      "meta_loss": 1.6090905666351318,
+      "query_accuracy": 0.5799999758601189
+    },
+    {
+      "episode": 20,
+      "meta_loss": 1.6088951528072357,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 21,
+      "meta_loss": 1.608909010887146,
+      "query_accuracy": 0.7299999818205833
+    },
+    {
+      "episode": 22,
+      "meta_loss": 1.6087457537651062,
+      "query_accuracy": 0.7699999660253525
+    },
+    {
+      "episode": 23,
+      "meta_loss": 1.6087706685066223,
+      "query_accuracy": 0.7799999713897705
+    },
+    {
+      "episode": 24,
+      "meta_loss": 1.609139770269394,
+      "query_accuracy": 0.4599999859929085
+    },
+    {
+      "episode": 25,
+      "meta_loss": 1.6091189682483673,
+      "query_accuracy": 0.5099999979138374
+    },
+    {
+      "episode": 26,
+      "meta_loss": 1.6091366112232208,
+      "query_accuracy": 0.5299999862909317
+    },
+    {
+      "episode": 27,
+      "meta_loss": 1.609079509973526,
+      "query_accuracy": 0.5299999788403511
+    },
+    {
+      "episode": 28,
+      "meta_loss": 1.609078973531723,
+      "query_accuracy": 0.6499999910593033
+    },
+    {
+      "episode": 29,
+      "meta_loss": 1.6088459193706512,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 30,
+      "meta_loss": 1.608982801437378,
+      "query_accuracy": 0.519999984651804
+    },
+    {
+      "episode": 31,
+      "meta_loss": 1.609140008687973,
+      "query_accuracy": 0.6099999845027924
+    },
+    {
+      "episode": 32,
+      "meta_loss": 1.609003335237503,
+      "query_accuracy": 0.6299999728798866
+    },
+    {
+      "episode": 33,
+      "meta_loss": 1.6089163720607758,
+      "query_accuracy": 0.6999999806284904
+    },
+    {
+      "episode": 34,
+      "meta_loss": 1.608976811170578,
+      "query_accuracy": 0.5799999833106995
+    },
+    {
+      "episode": 35,
+      "meta_loss": 1.60894775390625,
+      "query_accuracy": 0.5799999795854092
+    },
+    {
+      "episode": 36,
+      "meta_loss": 1.6088327765464783,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 37,
+      "meta_loss": 1.6089535653591156,
+      "query_accuracy": 0.5999999791383743
+    },
+    {
+      "episode": 38,
+      "meta_loss": 1.6090348958969116,
+      "query_accuracy": 0.5899999812245369
+    },
+    {
+      "episode": 39,
+      "meta_loss": 1.6089406609535217,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 40,
+      "meta_loss": 1.608990490436554,
+      "query_accuracy": 0.5899999737739563
+    },
+    {
+      "episode": 41,
+      "meta_loss": 1.6088975667953491,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 42,
+      "meta_loss": 1.6087053716182709,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 43,
+      "meta_loss": 1.6089089512825012,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 44,
+      "meta_loss": 1.6088334619998932,
+      "query_accuracy": 0.6799999922513962
+    },
+    {
+      "episode": 45,
+      "meta_loss": 1.6087297797203064,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 46,
+      "meta_loss": 1.6088798642158508,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 47,
+      "meta_loss": 1.6090535521507263,
+      "query_accuracy": 0.6099999845027924
+    },
+    {
+      "episode": 48,
+      "meta_loss": 1.6089358925819397,
+      "query_accuracy": 0.5899999812245369
+    },
+    {
+      "episode": 49,
+      "meta_loss": 1.6089036762714386,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 50,
+      "meta_loss": 1.6088625192642212,
+      "query_accuracy": 0.6799999848008156
+    },
+    {
+      "episode": 51,
+      "meta_loss": 1.608787477016449,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 52,
+      "meta_loss": 1.6089064180850983,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 53,
+      "meta_loss": 1.6089023351669312,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 54,
+      "meta_loss": 1.6090815961360931,
+      "query_accuracy": 0.5699999928474426
+    },
+    {
+      "episode": 55,
+      "meta_loss": 1.6089332401752472,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 56,
+      "meta_loss": 1.6089252531528473,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 57,
+      "meta_loss": 1.6087099611759186,
+      "query_accuracy": 0.6999999806284904
+    },
+    {
+      "episode": 58,
+      "meta_loss": 1.608735203742981,
+      "query_accuracy": 0.7699999809265137
+    },
+    {
+      "episode": 59,
+      "meta_loss": 1.609163075685501,
+      "query_accuracy": 0.44999998807907104
+    },
+    {
+      "episode": 60,
+      "meta_loss": 1.6086530983448029,
+      "query_accuracy": 0.8499999791383743
+    },
+    {
+      "episode": 61,
+      "meta_loss": 1.6090465188026428,
+      "query_accuracy": 0.4999999850988388
+    },
+    {
+      "episode": 62,
+      "meta_loss": 1.6089146435260773,
+      "query_accuracy": 0.609999991953373
+    },
+    {
+      "episode": 63,
+      "meta_loss": 1.6087283194065094,
+      "query_accuracy": 0.7699999660253525
+    },
+    {
+      "episode": 64,
+      "meta_loss": 1.6088704764842987,
+      "query_accuracy": 0.699999988079071
+    },
+    {
+      "episode": 65,
+      "meta_loss": 1.6089498102664948,
+      "query_accuracy": 0.6499999985098839
+    },
+    {
+      "episode": 66,
+      "meta_loss": 1.6088487207889557,
+      "query_accuracy": 0.669999971985817
+    },
+    {
+      "episode": 67,
+      "meta_loss": 1.6088379323482513,
+      "query_accuracy": 0.7199999839067459
+    },
+    {
+      "episode": 68,
+      "meta_loss": 1.608781784772873,
+      "query_accuracy": 0.6899999901652336
+    },
+    {
+      "episode": 69,
+      "meta_loss": 1.608842134475708,
+      "query_accuracy": 0.6299999877810478
+    },
+    {
+      "episode": 70,
+      "meta_loss": 1.60905522108078,
+      "query_accuracy": 0.5799999833106995
+    },
+    {
+      "episode": 71,
+      "meta_loss": 1.6086453795433044,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 72,
+      "meta_loss": 1.6087924540042877,
+      "query_accuracy": 0.7099999934434891
+    },
+    {
+      "episode": 73,
+      "meta_loss": 1.609051376581192,
+      "query_accuracy": 0.6099999845027924
+    },
+    {
+      "episode": 74,
+      "meta_loss": 1.6087457239627838,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 75,
+      "meta_loss": 1.6089157164096832,
+      "query_accuracy": 0.5799999982118607
+    },
+    {
+      "episode": 76,
+      "meta_loss": 1.6088947355747223,
+      "query_accuracy": 0.6299999728798866
+    },
+    {
+      "episode": 77,
+      "meta_loss": 1.608936369419098,
+      "query_accuracy": 0.609999991953373
+    },
+    {
+      "episode": 78,
+      "meta_loss": 1.6087878346443176,
+      "query_accuracy": 0.6399999782443047
+    },
+    {
+      "episode": 79,
+      "meta_loss": 1.6087465286254883,
+      "query_accuracy": 0.6799999848008156
+    },
+    {
+      "episode": 80,
+      "meta_loss": 1.6088639795780182,
+      "query_accuracy": 0.47999999672174454
+    },
+    {
+      "episode": 81,
+      "meta_loss": 1.6086039543151855,
+      "query_accuracy": 0.7899999842047691
+    },
+    {
+      "episode": 82,
+      "meta_loss": 1.6088232696056366,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 83,
+      "meta_loss": 1.6090467274188995,
+      "query_accuracy": 0.5099999830126762
+    },
+    {
+      "episode": 84,
+      "meta_loss": 1.6090098023414612,
+      "query_accuracy": 0.6199999824166298
+    },
+    {
+      "episode": 85,
+      "meta_loss": 1.608856350183487,
+      "query_accuracy": 0.6299999877810478
+    },
+    {
+      "episode": 86,
+      "meta_loss": 1.60902601480484,
+      "query_accuracy": 0.559999980032444
+    },
+    {
+      "episode": 87,
+      "meta_loss": 1.6089469492435455,
+      "query_accuracy": 0.6199999898672104
+    },
+    {
+      "episode": 88,
+      "meta_loss": 1.6089834868907928,
+      "query_accuracy": 0.6099999845027924
+    },
+    {
+      "episode": 89,
+      "meta_loss": 1.608882337808609,
+      "query_accuracy": 0.6399999707937241
+    },
+    {
+      "episode": 90,
+      "meta_loss": 1.6086631119251251,
+      "query_accuracy": 0.6699999868869781
+    },
+    {
+      "episode": 91,
+      "meta_loss": 1.6089796721935272,
+      "query_accuracy": 0.5399999767541885
+    },
+    {
+      "episode": 92,
+      "meta_loss": 1.6087497472763062,
+      "query_accuracy": 0.6499999836087227
+    },
+    {
+      "episode": 93,
+      "meta_loss": 1.6085432767868042,
+      "query_accuracy": 0.8199999630451202
+    },
+    {
+      "episode": 94,
+      "meta_loss": 1.6087967157363892,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 95,
+      "meta_loss": 1.6089973449707031,
+      "query_accuracy": 0.5799999833106995
+    },
+    {
+      "episode": 96,
+      "meta_loss": 1.6086200773715973,
+      "query_accuracy": 0.8299999982118607
+    },
+    {
+      "episode": 97,
+      "meta_loss": 1.6090503633022308,
+      "query_accuracy": 0.5599999874830246
+    },
+    {
+      "episode": 98,
+      "meta_loss": 1.6090335249900818,
+      "query_accuracy": 0.5099999904632568
+    },
+    {
+      "episode": 99,
+      "meta_loss": 1.6089609265327454,
+      "query_accuracy": 0.5999999791383743
+    },
+    {
+      "episode": 100,
+      "meta_loss": 1.6086597442626953,
+      "query_accuracy": 0.7799999788403511
+    },
+    {
+      "episode": 101,
+      "meta_loss": 1.6088866591453552,
+      "query_accuracy": 0.6299999877810478
+    },
+    {
+      "episode": 102,
+      "meta_loss": 1.6091082990169525,
+      "query_accuracy": 0.5799999907612801
+    },
+    {
+      "episode": 103,
+      "meta_loss": 1.6087974309921265,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 104,
+      "meta_loss": 1.608741670846939,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 105,
+      "meta_loss": 1.6087495386600494,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 106,
+      "meta_loss": 1.6086356341838837,
+      "query_accuracy": 0.7499999850988388
+    },
+    {
+      "episode": 107,
+      "meta_loss": 1.608999103307724,
+      "query_accuracy": 0.559999980032444
+    },
+    {
+      "episode": 108,
+      "meta_loss": 1.609105259180069,
+      "query_accuracy": 0.5099999755620956
+    },
+    {
+      "episode": 109,
+      "meta_loss": 1.608812540769577,
+      "query_accuracy": 0.6499999910593033
+    },
+    {
+      "episode": 110,
+      "meta_loss": 1.6089171171188354,
+      "query_accuracy": 0.5999999865889549
+    },
+    {
+      "episode": 111,
+      "meta_loss": 1.6089908480644226,
+      "query_accuracy": 0.549999974668026
+    },
+    {
+      "episode": 112,
+      "meta_loss": 1.608767181634903,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 113,
+      "meta_loss": 1.6087797284126282,
+      "query_accuracy": 0.7299999594688416
+    },
+    {
+      "episode": 114,
+      "meta_loss": 1.6089321672916412,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 115,
+      "meta_loss": 1.6088946461677551,
+      "query_accuracy": 0.5899999812245369
+    },
+    {
+      "episode": 116,
+      "meta_loss": 1.6088481843471527,
+      "query_accuracy": 0.5599999986588955
+    },
+    {
+      "episode": 117,
+      "meta_loss": 1.608951896429062,
+      "query_accuracy": 0.6199999824166298
+    },
+    {
+      "episode": 118,
+      "meta_loss": 1.6087523102760315,
+      "query_accuracy": 0.6199999786913395
+    },
+    {
+      "episode": 119,
+      "meta_loss": 1.6087537109851837,
+      "query_accuracy": 0.6899999752640724
+    },
+    {
+      "episode": 120,
+      "meta_loss": 1.6084924340248108,
+      "query_accuracy": 0.6699999645352364
+    },
+    {
+      "episode": 121,
+      "meta_loss": 1.6087805926799774,
+      "query_accuracy": 0.6999999806284904
+    },
+    {
+      "episode": 122,
+      "meta_loss": 1.6091188192367554,
+      "query_accuracy": 0.5799999833106995
+    },
+    {
+      "episode": 123,
+      "meta_loss": 1.6086052656173706,
+      "query_accuracy": 0.8399999737739563
+    },
+    {
+      "episode": 124,
+      "meta_loss": 1.609145849943161,
+      "query_accuracy": 0.5099999904632568
+    },
+    {
+      "episode": 125,
+      "meta_loss": 1.6089282631874084,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 126,
+      "meta_loss": 1.6090047359466553,
+      "query_accuracy": 0.5199999883770943
+    },
+    {
+      "episode": 127,
+      "meta_loss": 1.608713299036026,
+      "query_accuracy": 0.6599999740719795
+    },
+    {
+      "episode": 128,
+      "meta_loss": 1.608781486749649,
+      "query_accuracy": 0.739999994635582
+    },
+    {
+      "episode": 129,
+      "meta_loss": 1.608898639678955,
+      "query_accuracy": 0.5499999970197678
+    },
+    {
+      "episode": 130,
+      "meta_loss": 1.609085500240326,
+      "query_accuracy": 0.4899999871850014
+    },
+    {
+      "episode": 131,
+      "meta_loss": 1.6084861755371094,
+      "query_accuracy": 0.8699999749660492
+    },
+    {
+      "episode": 132,
+      "meta_loss": 1.608794927597046,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 133,
+      "meta_loss": 1.608573079109192,
+      "query_accuracy": 0.7699999809265137
+    },
+    {
+      "episode": 134,
+      "meta_loss": 1.6087712347507477,
+      "query_accuracy": 0.7099999710917473
+    },
+    {
+      "episode": 135,
+      "meta_loss": 1.6088369190692902,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 136,
+      "meta_loss": 1.6087636053562164,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 137,
+      "meta_loss": 1.6090447902679443,
+      "query_accuracy": 0.429999977350235
+    },
+    {
+      "episode": 138,
+      "meta_loss": 1.6086499392986298,
+      "query_accuracy": 0.7199999839067459
+    },
+    {
+      "episode": 139,
+      "meta_loss": 1.6086457073688507,
+      "query_accuracy": 0.8099999725818634
+    },
+    {
+      "episode": 140,
+      "meta_loss": 1.6090686321258545,
+      "query_accuracy": 0.4599999785423279
+    },
+    {
+      "episode": 141,
+      "meta_loss": 1.6089003682136536,
+      "query_accuracy": 0.6199999898672104
+    },
+    {
+      "episode": 142,
+      "meta_loss": 1.6086947917938232,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 143,
+      "meta_loss": 1.6087446808815002,
+      "query_accuracy": 0.7499999850988388
+    },
+    {
+      "episode": 144,
+      "meta_loss": 1.608408123254776,
+      "query_accuracy": 0.7699999660253525
+    },
+    {
+      "episode": 145,
+      "meta_loss": 1.608656883239746,
+      "query_accuracy": 0.6799999922513962
+    },
+    {
+      "episode": 146,
+      "meta_loss": 1.608673095703125,
+      "query_accuracy": 0.6899999976158142
+    },
+    {
+      "episode": 147,
+      "meta_loss": 1.6087955832481384,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 148,
+      "meta_loss": 1.6088252365589142,
+      "query_accuracy": 0.6399999782443047
+    },
+    {
+      "episode": 149,
+      "meta_loss": 1.6089521944522858,
+      "query_accuracy": 0.5799999684095383
+    },
+    {
+      "episode": 150,
+      "meta_loss": 1.6087338626384735,
+      "query_accuracy": 0.6899999678134918
+    },
+    {
+      "episode": 151,
+      "meta_loss": 1.6087684035301208,
+      "query_accuracy": 0.7199999690055847
+    },
+    {
+      "episode": 152,
+      "meta_loss": 1.6089114248752594,
+      "query_accuracy": 0.619999997317791
+    },
+    {
+      "episode": 153,
+      "meta_loss": 1.6085586249828339,
+      "query_accuracy": 0.7599999755620956
+    },
+    {
+      "episode": 154,
+      "meta_loss": 1.6084927916526794,
+      "query_accuracy": 0.7099999934434891
+    },
+    {
+      "episode": 155,
+      "meta_loss": 1.6088542342185974,
+      "query_accuracy": 0.6499999910593033
+    },
+    {
+      "episode": 156,
+      "meta_loss": 1.6086092293262482,
+      "query_accuracy": 0.799999974668026
+    },
+    {
+      "episode": 157,
+      "meta_loss": 1.6089237034320831,
+      "query_accuracy": 0.6799999922513962
+    },
+    {
+      "episode": 158,
+      "meta_loss": 1.6090053617954254,
+      "query_accuracy": 0.6199999824166298
+    },
+    {
+      "episode": 159,
+      "meta_loss": 1.6085863709449768,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 160,
+      "meta_loss": 1.6089990139007568,
+      "query_accuracy": 0.5999999791383743
+    },
+    {
+      "episode": 161,
+      "meta_loss": 1.608533263206482,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 162,
+      "meta_loss": 1.6087262332439423,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 163,
+      "meta_loss": 1.6089045405387878,
+      "query_accuracy": 0.5999999791383743
+    },
+    {
+      "episode": 164,
+      "meta_loss": 1.609013020992279,
+      "query_accuracy": 0.5499999821186066
+    },
+    {
+      "episode": 165,
+      "meta_loss": 1.6088355481624603,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 166,
+      "meta_loss": 1.6086949706077576,
+      "query_accuracy": 0.669999971985817
+    },
+    {
+      "episode": 167,
+      "meta_loss": 1.6084480583667755,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 168,
+      "meta_loss": 1.6088367700576782,
+      "query_accuracy": 0.6599999964237213
+    },
+    {
+      "episode": 169,
+      "meta_loss": 1.6086740493774414,
+      "query_accuracy": 0.6699999943375587
+    },
+    {
+      "episode": 170,
+      "meta_loss": 1.60859015583992,
+      "query_accuracy": 0.6299999728798866
+    },
+    {
+      "episode": 171,
+      "meta_loss": 1.6089781522750854,
+      "query_accuracy": 0.5499999895691872
+    },
+    {
+      "episode": 172,
+      "meta_loss": 1.6087700426578522,
+      "query_accuracy": 0.6599999889731407
+    },
+    {
+      "episode": 173,
+      "meta_loss": 1.6087075769901276,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 174,
+      "meta_loss": 1.608830213546753,
+      "query_accuracy": 0.6599999666213989
+    },
+    {
+      "episode": 175,
+      "meta_loss": 1.6087589263916016,
+      "query_accuracy": 0.5999999940395355
+    },
+    {
+      "episode": 176,
+      "meta_loss": 1.6089141368865967,
+      "query_accuracy": 0.609999991953373
+    },
+    {
+      "episode": 177,
+      "meta_loss": 1.6089183688163757,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 178,
+      "meta_loss": 1.6083785891532898,
+      "query_accuracy": 0.7899999916553497
+    },
+    {
+      "episode": 179,
+      "meta_loss": 1.6088251173496246,
+      "query_accuracy": 0.6099999770522118
+    },
+    {
+      "episode": 180,
+      "meta_loss": 1.6085281074047089,
+      "query_accuracy": 0.7899999767541885
+    },
+    {
+      "episode": 181,
+      "meta_loss": 1.6084960103034973,
+      "query_accuracy": 0.7199999913573265
+    },
+    {
+      "episode": 182,
+      "meta_loss": 1.6085525155067444,
+      "query_accuracy": 0.699999988079071
+    },
+    {
+      "episode": 183,
+      "meta_loss": 1.6087807416915894,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 184,
+      "meta_loss": 1.6088540852069855,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 185,
+      "meta_loss": 1.608489990234375,
+      "query_accuracy": 0.7199999839067459
+    },
+    {
+      "episode": 186,
+      "meta_loss": 1.6084936559200287,
+      "query_accuracy": 0.8199999779462814
+    },
+    {
+      "episode": 187,
+      "meta_loss": 1.6085276901721954,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 188,
+      "meta_loss": 1.6078883111476898,
+      "query_accuracy": 0.939999982714653
+    },
+    {
+      "episode": 189,
+      "meta_loss": 1.6085346937179565,
+      "query_accuracy": 0.6599999889731407
+    },
+    {
+      "episode": 190,
+      "meta_loss": 1.608391910791397,
+      "query_accuracy": 0.8299999684095383
+    },
+    {
+      "episode": 191,
+      "meta_loss": 1.6086260080337524,
+      "query_accuracy": 0.7199999690055847
+    },
+    {
+      "episode": 192,
+      "meta_loss": 1.6084838807582855,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 193,
+      "meta_loss": 1.60875603556633,
+      "query_accuracy": 0.6199999898672104
+    },
+    {
+      "episode": 194,
+      "meta_loss": 1.6089027523994446,
+      "query_accuracy": 0.5899999812245369
+    },
+    {
+      "episode": 195,
+      "meta_loss": 1.6088526248931885,
+      "query_accuracy": 0.5099999830126762
+    },
+    {
+      "episode": 196,
+      "meta_loss": 1.6085610389709473,
+      "query_accuracy": 0.7899999767541885
+    },
+    {
+      "episode": 197,
+      "meta_loss": 1.6088437139987946,
+      "query_accuracy": 0.6599999964237213
+    },
+    {
+      "episode": 198,
+      "meta_loss": 1.6084600389003754,
+      "query_accuracy": 0.8299999684095383
+    },
+    {
+      "episode": 199,
+      "meta_loss": 1.6082263886928558,
+      "query_accuracy": 0.7999999970197678
+    },
+    {
+      "episode": 200,
+      "meta_loss": 1.6088667809963226,
+      "query_accuracy": 0.5999999791383743
+    },
+    {
+      "episode": 201,
+      "meta_loss": 1.6081984341144562,
+      "query_accuracy": 0.7899999916553497
+    },
+    {
+      "episode": 202,
+      "meta_loss": 1.6085346937179565,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 203,
+      "meta_loss": 1.6088781356811523,
+      "query_accuracy": 0.609999991953373
+    },
+    {
+      "episode": 204,
+      "meta_loss": 1.608794927597046,
+      "query_accuracy": 0.5499999821186066
+    },
+    {
+      "episode": 205,
+      "meta_loss": 1.6084574460983276,
+      "query_accuracy": 0.8299999684095383
+    },
+    {
+      "episode": 206,
+      "meta_loss": 1.6089931428432465,
+      "query_accuracy": 0.5299999788403511
+    },
+    {
+      "episode": 207,
+      "meta_loss": 1.608837068080902,
+      "query_accuracy": 0.5199999958276749
+    },
+    {
+      "episode": 208,
+      "meta_loss": 1.60878524184227,
+      "query_accuracy": 0.5799999833106995
+    },
+    {
+      "episode": 209,
+      "meta_loss": 1.6088184714317322,
+      "query_accuracy": 0.6199999749660492
+    },
+    {
+      "episode": 210,
+      "meta_loss": 1.6086961030960083,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 211,
+      "meta_loss": 1.6085735857486725,
+      "query_accuracy": 0.7599999755620956
+    },
+    {
+      "episode": 212,
+      "meta_loss": 1.6082981526851654,
+      "query_accuracy": 0.7899999767541885
+    },
+    {
+      "episode": 213,
+      "meta_loss": 1.6086290776729584,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 214,
+      "meta_loss": 1.6085287630558014,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 215,
+      "meta_loss": 1.6085210740566254,
+      "query_accuracy": 0.6899999752640724
+    },
+    {
+      "episode": 216,
+      "meta_loss": 1.6083548963069916,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 217,
+      "meta_loss": 1.6087387800216675,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 218,
+      "meta_loss": 1.608607143163681,
+      "query_accuracy": 0.7099999636411667
+    },
+    {
+      "episode": 219,
+      "meta_loss": 1.6084729731082916,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 220,
+      "meta_loss": 1.608497142791748,
+      "query_accuracy": 0.7199999764561653
+    },
+    {
+      "episode": 221,
+      "meta_loss": 1.6085104942321777,
+      "query_accuracy": 0.7899999767541885
+    },
+    {
+      "episode": 222,
+      "meta_loss": 1.6081765294075012,
+      "query_accuracy": 0.7499999701976776
+    },
+    {
+      "episode": 223,
+      "meta_loss": 1.6086176931858063,
+      "query_accuracy": 0.6299999877810478
+    },
+    {
+      "episode": 224,
+      "meta_loss": 1.608439177274704,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 225,
+      "meta_loss": 1.6080174148082733,
+      "query_accuracy": 0.8999999910593033
+    },
+    {
+      "episode": 226,
+      "meta_loss": 1.6085070669651031,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 227,
+      "meta_loss": 1.6087969541549683,
+      "query_accuracy": 0.559999980032444
+    },
+    {
+      "episode": 228,
+      "meta_loss": 1.6087152063846588,
+      "query_accuracy": 0.6199999824166298
+    },
+    {
+      "episode": 229,
+      "meta_loss": 1.6082285940647125,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 230,
+      "meta_loss": 1.608792245388031,
+      "query_accuracy": 0.5899999737739563
+    },
+    {
+      "episode": 231,
+      "meta_loss": 1.608500361442566,
+      "query_accuracy": 0.6599999889731407
+    },
+    {
+      "episode": 232,
+      "meta_loss": 1.6086291074752808,
+      "query_accuracy": 0.6499999836087227
+    },
+    {
+      "episode": 233,
+      "meta_loss": 1.6086954176425934,
+      "query_accuracy": 0.6199999824166298
+    },
+    {
+      "episode": 234,
+      "meta_loss": 1.6085500121116638,
+      "query_accuracy": 0.6499999836087227
+    },
+    {
+      "episode": 235,
+      "meta_loss": 1.6084976196289062,
+      "query_accuracy": 0.7699999734759331
+    },
+    {
+      "episode": 236,
+      "meta_loss": 1.6081642508506775,
+      "query_accuracy": 0.7899999916553497
+    },
+    {
+      "episode": 237,
+      "meta_loss": 1.6086738407611847,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 238,
+      "meta_loss": 1.6087577939033508,
+      "query_accuracy": 0.569999985396862
+    },
+    {
+      "episode": 239,
+      "meta_loss": 1.608820229768753,
+      "query_accuracy": 0.5999999865889549
+    },
+    {
+      "episode": 240,
+      "meta_loss": 1.608749121427536,
+      "query_accuracy": 0.5999999791383743
+    },
+    {
+      "episode": 241,
+      "meta_loss": 1.6089478135108948,
+      "query_accuracy": 0.44999998807907104
+    },
+    {
+      "episode": 242,
+      "meta_loss": 1.6085293591022491,
+      "query_accuracy": 0.6899999901652336
+    },
+    {
+      "episode": 243,
+      "meta_loss": 1.608239322900772,
+      "query_accuracy": 0.699999988079071
+    },
+    {
+      "episode": 244,
+      "meta_loss": 1.6084046065807343,
+      "query_accuracy": 0.7699999958276749
+    },
+    {
+      "episode": 245,
+      "meta_loss": 1.6083682179450989,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 246,
+      "meta_loss": 1.608334869146347,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 247,
+      "meta_loss": 1.6079922020435333,
+      "query_accuracy": 0.8299999684095383
+    },
+    {
+      "episode": 248,
+      "meta_loss": 1.6085800528526306,
+      "query_accuracy": 0.6499999836087227
+    },
+    {
+      "episode": 249,
+      "meta_loss": 1.608368456363678,
+      "query_accuracy": 0.739999994635582
+    },
+    {
+      "episode": 250,
+      "meta_loss": 1.6082565188407898,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 251,
+      "meta_loss": 1.6083039939403534,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 252,
+      "meta_loss": 1.6086164116859436,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 253,
+      "meta_loss": 1.6089511215686798,
+      "query_accuracy": 0.5999999865889549
+    },
+    {
+      "episode": 254,
+      "meta_loss": 1.6084463894367218,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 255,
+      "meta_loss": 1.6082760989665985,
+      "query_accuracy": 0.7999999672174454
+    },
+    {
+      "episode": 256,
+      "meta_loss": 1.608335703611374,
+      "query_accuracy": 0.7199999839067459
+    },
+    {
+      "episode": 257,
+      "meta_loss": 1.6088109016418457,
+      "query_accuracy": 0.5799999907612801
+    },
+    {
+      "episode": 258,
+      "meta_loss": 1.6084493398666382,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 259,
+      "meta_loss": 1.6087474524974823,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 260,
+      "meta_loss": 1.608513981103897,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 261,
+      "meta_loss": 1.6087082624435425,
+      "query_accuracy": 0.6499999910593033
+    },
+    {
+      "episode": 262,
+      "meta_loss": 1.6083453297615051,
+      "query_accuracy": 0.699999988079071
+    },
+    {
+      "episode": 263,
+      "meta_loss": 1.608681321144104,
+      "query_accuracy": 0.5699999779462814
+    },
+    {
+      "episode": 264,
+      "meta_loss": 1.6085958182811737,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 265,
+      "meta_loss": 1.6086899042129517,
+      "query_accuracy": 0.6199999824166298
+    },
+    {
+      "episode": 266,
+      "meta_loss": 1.6081067323684692,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 267,
+      "meta_loss": 1.6084651052951813,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 268,
+      "meta_loss": 1.6087007224559784,
+      "query_accuracy": 0.6499999910593033
+    },
+    {
+      "episode": 269,
+      "meta_loss": 1.608831763267517,
+      "query_accuracy": 0.5799999907612801
+    },
+    {
+      "episode": 270,
+      "meta_loss": 1.6081661880016327,
+      "query_accuracy": 0.7899999916553497
+    },
+    {
+      "episode": 271,
+      "meta_loss": 1.6084977090358734,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 272,
+      "meta_loss": 1.608686774969101,
+      "query_accuracy": 0.5899999886751175
+    },
+    {
+      "episode": 273,
+      "meta_loss": 1.6081477105617523,
+      "query_accuracy": 0.7699999809265137
+    },
+    {
+      "episode": 274,
+      "meta_loss": 1.6086540520191193,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 275,
+      "meta_loss": 1.6086757183074951,
+      "query_accuracy": 0.6099999845027924
+    },
+    {
+      "episode": 276,
+      "meta_loss": 1.607966274023056,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 277,
+      "meta_loss": 1.608396202325821,
+      "query_accuracy": 0.6899999678134918
+    },
+    {
+      "episode": 278,
+      "meta_loss": 1.6082670986652374,
+      "query_accuracy": 0.7199999839067459
+    },
+    {
+      "episode": 279,
+      "meta_loss": 1.607743263244629,
+      "query_accuracy": 0.8799999952316284
+    },
+    {
+      "episode": 280,
+      "meta_loss": 1.60862997174263,
+      "query_accuracy": 0.569999985396862
+    },
+    {
+      "episode": 281,
+      "meta_loss": 1.6081821918487549,
+      "query_accuracy": 0.7599999830126762
+    },
+    {
+      "episode": 282,
+      "meta_loss": 1.6087655425071716,
+      "query_accuracy": 0.5499999821186066
+    },
+    {
+      "episode": 283,
+      "meta_loss": 1.608875960111618,
+      "query_accuracy": 0.5899999886751175
+    },
+    {
+      "episode": 284,
+      "meta_loss": 1.6080217957496643,
+      "query_accuracy": 0.7899999767541885
+    },
+    {
+      "episode": 285,
+      "meta_loss": 1.6088546216487885,
+      "query_accuracy": 0.5599999874830246
+    },
+    {
+      "episode": 286,
+      "meta_loss": 1.608810007572174,
+      "query_accuracy": 0.6399999782443047
+    },
+    {
+      "episode": 287,
+      "meta_loss": 1.608223170042038,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 288,
+      "meta_loss": 1.6081849932670593,
+      "query_accuracy": 0.7099999859929085
+    },
+    {
+      "episode": 289,
+      "meta_loss": 1.608374536037445,
+      "query_accuracy": 0.609999991953373
+    },
+    {
+      "episode": 290,
+      "meta_loss": 1.6082795560359955,
+      "query_accuracy": 0.7699999809265137
+    },
+    {
+      "episode": 291,
+      "meta_loss": 1.6083904206752777,
+      "query_accuracy": 0.7699999809265137
+    },
+    {
+      "episode": 292,
+      "meta_loss": 1.6088730096817017,
+      "query_accuracy": 0.5499999895691872
+    },
+    {
+      "episode": 293,
+      "meta_loss": 1.6080984473228455,
+      "query_accuracy": 0.8199999779462814
+    },
+    {
+      "episode": 294,
+      "meta_loss": 1.6086309850215912,
+      "query_accuracy": 0.5999999865889549
+    },
+    {
+      "episode": 295,
+      "meta_loss": 1.60809725522995,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 296,
+      "meta_loss": 1.6083985567092896,
+      "query_accuracy": 0.6899999901652336
+    },
+    {
+      "episode": 297,
+      "meta_loss": 1.60848268866539,
+      "query_accuracy": 0.5999999865889549
+    },
+    {
+      "episode": 298,
+      "meta_loss": 1.608500599861145,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 299,
+      "meta_loss": 1.6081381440162659,
+      "query_accuracy": 0.8299999684095383
+    },
+    {
+      "episode": 300,
+      "meta_loss": 1.6084370911121368,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 301,
+      "meta_loss": 1.608458012342453,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 302,
+      "meta_loss": 1.6083427667617798,
+      "query_accuracy": 0.7299999818205833
+    },
+    {
+      "episode": 303,
+      "meta_loss": 1.608782798051834,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 304,
+      "meta_loss": 1.6081345975399017,
+      "query_accuracy": 0.8699999749660492
+    },
+    {
+      "episode": 305,
+      "meta_loss": 1.6080209612846375,
+      "query_accuracy": 0.8099999874830246
+    },
+    {
+      "episode": 306,
+      "meta_loss": 1.6084202229976654,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 307,
+      "meta_loss": 1.608861356973648,
+      "query_accuracy": 0.5799999907612801
+    },
+    {
+      "episode": 308,
+      "meta_loss": 1.6083132326602936,
+      "query_accuracy": 0.699999988079071
+    },
+    {
+      "episode": 309,
+      "meta_loss": 1.6085256040096283,
+      "query_accuracy": 0.6799999922513962
+    },
+    {
+      "episode": 310,
+      "meta_loss": 1.6084420680999756,
+      "query_accuracy": 0.6799999922513962
+    },
+    {
+      "episode": 311,
+      "meta_loss": 1.6085441410541534,
+      "query_accuracy": 0.6700000017881393
+    },
+    {
+      "episode": 312,
+      "meta_loss": 1.608004093170166,
+      "query_accuracy": 0.869999960064888
+    },
+    {
+      "episode": 313,
+      "meta_loss": 1.6082743406295776,
+      "query_accuracy": 0.7699999809265137
+    },
+    {
+      "episode": 314,
+      "meta_loss": 1.608469396829605,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 315,
+      "meta_loss": 1.6080315113067627,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 316,
+      "meta_loss": 1.6083863079547882,
+      "query_accuracy": 0.6699999943375587
+    },
+    {
+      "episode": 317,
+      "meta_loss": 1.608655959367752,
+      "query_accuracy": 0.6199999824166298
+    },
+    {
+      "episode": 318,
+      "meta_loss": 1.6080932915210724,
+      "query_accuracy": 0.7599999755620956
+    },
+    {
+      "episode": 319,
+      "meta_loss": 1.6089010536670685,
+      "query_accuracy": 0.5599999874830246
+    },
+    {
+      "episode": 320,
+      "meta_loss": 1.6083596050739288,
+      "query_accuracy": 0.6299999877810478
+    },
+    {
+      "episode": 321,
+      "meta_loss": 1.6082510948181152,
+      "query_accuracy": 0.7599999755620956
+    },
+    {
+      "episode": 322,
+      "meta_loss": 1.6085375547409058,
+      "query_accuracy": 0.5799999684095383
+    },
+    {
+      "episode": 323,
+      "meta_loss": 1.6081096231937408,
+      "query_accuracy": 0.609999991953373
+    },
+    {
+      "episode": 324,
+      "meta_loss": 1.6087372601032257,
+      "query_accuracy": 0.4999999925494194
+    },
+    {
+      "episode": 325,
+      "meta_loss": 1.6082234382629395,
+      "query_accuracy": 0.7799999713897705
+    },
+    {
+      "episode": 326,
+      "meta_loss": 1.6083662509918213,
+      "query_accuracy": 0.6999999955296516
+    },
+    {
+      "episode": 327,
+      "meta_loss": 1.6083778142929077,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 328,
+      "meta_loss": 1.6085567474365234,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 329,
+      "meta_loss": 1.6084516048431396,
+      "query_accuracy": 0.6699999868869781
+    },
+    {
+      "episode": 330,
+      "meta_loss": 1.6082218289375305,
+      "query_accuracy": 0.7199999690055847
+    },
+    {
+      "episode": 331,
+      "meta_loss": 1.6082558333873749,
+      "query_accuracy": 0.739999994635582
+    },
+    {
+      "episode": 332,
+      "meta_loss": 1.6081106066703796,
+      "query_accuracy": 0.8199999779462814
+    },
+    {
+      "episode": 333,
+      "meta_loss": 1.6082400381565094,
+      "query_accuracy": 0.7299999818205833
+    },
+    {
+      "episode": 334,
+      "meta_loss": 1.6088486909866333,
+      "query_accuracy": 0.5599999874830246
+    },
+    {
+      "episode": 335,
+      "meta_loss": 1.608409732580185,
+      "query_accuracy": 0.5899999774992466
+    },
+    {
+      "episode": 336,
+      "meta_loss": 1.6081575453281403,
+      "query_accuracy": 0.7799999862909317
+    },
+    {
+      "episode": 337,
+      "meta_loss": 1.60864919424057,
+      "query_accuracy": 0.5699999779462814
+    },
+    {
+      "episode": 338,
+      "meta_loss": 1.6084324419498444,
+      "query_accuracy": 0.7099999934434891
+    },
+    {
+      "episode": 339,
+      "meta_loss": 1.6083755195140839,
+      "query_accuracy": 0.699999988079071
+    },
+    {
+      "episode": 340,
+      "meta_loss": 1.608682006597519,
+      "query_accuracy": 0.5899999886751175
+    },
+    {
+      "episode": 341,
+      "meta_loss": 1.6079623401165009,
+      "query_accuracy": 0.8599999696016312
+    },
+    {
+      "episode": 342,
+      "meta_loss": 1.6089154779911041,
+      "query_accuracy": 0.5499999970197678
+    },
+    {
+      "episode": 343,
+      "meta_loss": 1.6081062257289886,
+      "query_accuracy": 0.7499999701976776
+    },
+    {
+      "episode": 344,
+      "meta_loss": 1.6085230112075806,
+      "query_accuracy": 0.6199999749660492
+    },
+    {
+      "episode": 345,
+      "meta_loss": 1.6085687279701233,
+      "query_accuracy": 0.6099999845027924
+    },
+    {
+      "episode": 346,
+      "meta_loss": 1.6079780161380768,
+      "query_accuracy": 0.7199999690055847
+    },
+    {
+      "episode": 347,
+      "meta_loss": 1.6082657277584076,
+      "query_accuracy": 0.6299999877810478
+    },
+    {
+      "episode": 348,
+      "meta_loss": 1.6085034608840942,
+      "query_accuracy": 0.6299999803304672
+    },
+    {
+      "episode": 349,
+      "meta_loss": 1.6084113419055939,
+      "query_accuracy": 0.6199999749660492
+    },
+    {
+      "episode": 350,
+      "meta_loss": 1.6084857881069183,
+      "query_accuracy": 0.6299999803304672
+    },
+    {
+      "episode": 351,
+      "meta_loss": 1.6079304814338684,
+      "query_accuracy": 0.7799999862909317
+    },
+    {
+      "episode": 352,
+      "meta_loss": 1.6083640158176422,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 353,
+      "meta_loss": 1.6088397204875946,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 354,
+      "meta_loss": 1.6086385548114777,
+      "query_accuracy": 0.5899999812245369
+    },
+    {
+      "episode": 355,
+      "meta_loss": 1.6082446575164795,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 356,
+      "meta_loss": 1.6081985235214233,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 357,
+      "meta_loss": 1.6085686087608337,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 358,
+      "meta_loss": 1.6080133318901062,
+      "query_accuracy": 0.7800000011920929
+    },
+    {
+      "episode": 359,
+      "meta_loss": 1.6083380579948425,
+      "query_accuracy": 0.699999988079071
+    },
+    {
+      "episode": 360,
+      "meta_loss": 1.6085491478443146,
+      "query_accuracy": 0.6299999803304672
+    },
+    {
+      "episode": 361,
+      "meta_loss": 1.6085744202136993,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 362,
+      "meta_loss": 1.6083490550518036,
+      "query_accuracy": 0.699999988079071
+    },
+    {
+      "episode": 363,
+      "meta_loss": 1.607997477054596,
+      "query_accuracy": 0.7699999809265137
+    },
+    {
+      "episode": 364,
+      "meta_loss": 1.6077042520046234,
+      "query_accuracy": 0.8899999856948853
+    },
+    {
+      "episode": 365,
+      "meta_loss": 1.6084368824958801,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 366,
+      "meta_loss": 1.6079485416412354,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 367,
+      "meta_loss": 1.6075539588928223,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 368,
+      "meta_loss": 1.6081285178661346,
+      "query_accuracy": 0.7499999701976776
+    },
+    {
+      "episode": 369,
+      "meta_loss": 1.608925312757492,
+      "query_accuracy": 0.5399999916553497
+    },
+    {
+      "episode": 370,
+      "meta_loss": 1.608292669057846,
+      "query_accuracy": 0.7599999755620956
+    },
+    {
+      "episode": 371,
+      "meta_loss": 1.6085865795612335,
+      "query_accuracy": 0.6299999877810478
+    },
+    {
+      "episode": 372,
+      "meta_loss": 1.608149230480194,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 373,
+      "meta_loss": 1.608269453048706,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 374,
+      "meta_loss": 1.6082980334758759,
+      "query_accuracy": 0.6699999794363976
+    },
+    {
+      "episode": 375,
+      "meta_loss": 1.608303040266037,
+      "query_accuracy": 0.6899999752640724
+    },
+    {
+      "episode": 376,
+      "meta_loss": 1.6078208982944489,
+      "query_accuracy": 0.8099999725818634
+    },
+    {
+      "episode": 377,
+      "meta_loss": 1.6082123816013336,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 378,
+      "meta_loss": 1.6082749664783478,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 379,
+      "meta_loss": 1.6082344353199005,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 380,
+      "meta_loss": 1.6085777878761292,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 381,
+      "meta_loss": 1.608564406633377,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 382,
+      "meta_loss": 1.608622968196869,
+      "query_accuracy": 0.5899999886751175
+    },
+    {
+      "episode": 383,
+      "meta_loss": 1.6088527143001556,
+      "query_accuracy": 0.5399999842047691
+    },
+    {
+      "episode": 384,
+      "meta_loss": 1.6082322895526886,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 385,
+      "meta_loss": 1.6087219417095184,
+      "query_accuracy": 0.559999980032444
+    },
+    {
+      "episode": 386,
+      "meta_loss": 1.6079798936843872,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 387,
+      "meta_loss": 1.6082367897033691,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 388,
+      "meta_loss": 1.6083271205425262,
+      "query_accuracy": 0.6499999910593033
+    },
+    {
+      "episode": 389,
+      "meta_loss": 1.6072683334350586,
+      "query_accuracy": 0.9099999666213989
+    },
+    {
+      "episode": 390,
+      "meta_loss": 1.6078567504882812,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 391,
+      "meta_loss": 1.608533650636673,
+      "query_accuracy": 0.5999999865889549
+    },
+    {
+      "episode": 392,
+      "meta_loss": 1.6084681451320648,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 393,
+      "meta_loss": 1.6085157096385956,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 394,
+      "meta_loss": 1.6080403327941895,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 395,
+      "meta_loss": 1.6081633865833282,
+      "query_accuracy": 0.7999999672174454
+    },
+    {
+      "episode": 396,
+      "meta_loss": 1.6088354587554932,
+      "query_accuracy": 0.5699999928474426
+    },
+    {
+      "episode": 397,
+      "meta_loss": 1.6083108484745026,
+      "query_accuracy": 0.6899999901652336
+    },
+    {
+      "episode": 398,
+      "meta_loss": 1.6081498861312866,
+      "query_accuracy": 0.6799999848008156
+    },
+    {
+      "episode": 399,
+      "meta_loss": 1.6082625091075897,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 400,
+      "meta_loss": 1.6081212759017944,
+      "query_accuracy": 0.7699999809265137
+    },
+    {
+      "episode": 401,
+      "meta_loss": 1.608338624238968,
+      "query_accuracy": 0.7499999701976776
+    },
+    {
+      "episode": 402,
+      "meta_loss": 1.608432561159134,
+      "query_accuracy": 0.629999965429306
+    },
+    {
+      "episode": 403,
+      "meta_loss": 1.608176976442337,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 404,
+      "meta_loss": 1.6082176864147186,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 405,
+      "meta_loss": 1.6079372763633728,
+      "query_accuracy": 0.7899999767541885
+    },
+    {
+      "episode": 406,
+      "meta_loss": 1.6080973744392395,
+      "query_accuracy": 0.6999999806284904
+    },
+    {
+      "episode": 407,
+      "meta_loss": 1.607459306716919,
+      "query_accuracy": 0.7199999839067459
+    },
+    {
+      "episode": 408,
+      "meta_loss": 1.6086890697479248,
+      "query_accuracy": 0.6199999898672104
+    },
+    {
+      "episode": 409,
+      "meta_loss": 1.6080138385295868,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 410,
+      "meta_loss": 1.6080708801746368,
+      "query_accuracy": 0.6899999678134918
+    },
+    {
+      "episode": 411,
+      "meta_loss": 1.6082620024681091,
+      "query_accuracy": 0.7199999839067459
+    },
+    {
+      "episode": 412,
+      "meta_loss": 1.6081802546977997,
+      "query_accuracy": 0.6599999889731407
+    },
+    {
+      "episode": 413,
+      "meta_loss": 1.6081910133361816,
+      "query_accuracy": 0.6799999848008156
+    },
+    {
+      "episode": 414,
+      "meta_loss": 1.6087820827960968,
+      "query_accuracy": 0.5599999874830246
+    },
+    {
+      "episode": 415,
+      "meta_loss": 1.608118861913681,
+      "query_accuracy": 0.6699999868869781
+    },
+    {
+      "episode": 416,
+      "meta_loss": 1.608649730682373,
+      "query_accuracy": 0.6399999856948853
+    },
+    {
+      "episode": 417,
+      "meta_loss": 1.6080599129199982,
+      "query_accuracy": 0.7699999660253525
+    },
+    {
+      "episode": 418,
+      "meta_loss": 1.608327478170395,
+      "query_accuracy": 0.5899999886751175
+    },
+    {
+      "episode": 419,
+      "meta_loss": 1.60853910446167,
+      "query_accuracy": 0.5999999940395355
+    },
+    {
+      "episode": 420,
+      "meta_loss": 1.6083016395568848,
+      "query_accuracy": 0.6599999964237213
+    },
+    {
+      "episode": 421,
+      "meta_loss": 1.607966125011444,
+      "query_accuracy": 0.7599999755620956
+    },
+    {
+      "episode": 422,
+      "meta_loss": 1.6081913113594055,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 423,
+      "meta_loss": 1.6085155308246613,
+      "query_accuracy": 0.5599999874830246
+    },
+    {
+      "episode": 424,
+      "meta_loss": 1.6072680056095123,
+      "query_accuracy": 0.8799999803304672
+    },
+    {
+      "episode": 425,
+      "meta_loss": 1.6082879304885864,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 426,
+      "meta_loss": 1.6079826354980469,
+      "query_accuracy": 0.8099999874830246
+    },
+    {
+      "episode": 427,
+      "meta_loss": 1.6078786551952362,
+      "query_accuracy": 0.7899999916553497
+    },
+    {
+      "episode": 428,
+      "meta_loss": 1.6083124279975891,
+      "query_accuracy": 0.5899999961256981
+    },
+    {
+      "episode": 429,
+      "meta_loss": 1.6078371703624725,
+      "query_accuracy": 0.7599999755620956
+    },
+    {
+      "episode": 430,
+      "meta_loss": 1.6082094311714172,
+      "query_accuracy": 0.7899999767541885
+    },
+    {
+      "episode": 431,
+      "meta_loss": 1.6085328459739685,
+      "query_accuracy": 0.5999999940395355
+    },
+    {
+      "episode": 432,
+      "meta_loss": 1.6083838641643524,
+      "query_accuracy": 0.5499999858438969
+    },
+    {
+      "episode": 433,
+      "meta_loss": 1.6079437136650085,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 434,
+      "meta_loss": 1.6073668897151947,
+      "query_accuracy": 0.7799999937415123
+    },
+    {
+      "episode": 435,
+      "meta_loss": 1.6081455051898956,
+      "query_accuracy": 0.6899999976158142
+    },
+    {
+      "episode": 436,
+      "meta_loss": 1.6082777380943298,
+      "query_accuracy": 0.7199999988079071
+    },
+    {
+      "episode": 437,
+      "meta_loss": 1.607995867729187,
+      "query_accuracy": 0.7699999809265137
+    },
+    {
+      "episode": 438,
+      "meta_loss": 1.6073778867721558,
+      "query_accuracy": 0.8399999737739563
+    },
+    {
+      "episode": 439,
+      "meta_loss": 1.6081261336803436,
+      "query_accuracy": 0.6899999678134918
+    },
+    {
+      "episode": 440,
+      "meta_loss": 1.608373910188675,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 441,
+      "meta_loss": 1.6074780821800232,
+      "query_accuracy": 0.8699999749660492
+    },
+    {
+      "episode": 442,
+      "meta_loss": 1.608238309621811,
+      "query_accuracy": 0.6499999687075615
+    },
+    {
+      "episode": 443,
+      "meta_loss": 1.6084942519664764,
+      "query_accuracy": 0.6399999782443047
+    },
+    {
+      "episode": 444,
+      "meta_loss": 1.6076411306858063,
+      "query_accuracy": 0.7499999776482582
+    },
+    {
+      "episode": 445,
+      "meta_loss": 1.6084041595458984,
+      "query_accuracy": 0.6899999976158142
+    },
+    {
+      "episode": 446,
+      "meta_loss": 1.608018159866333,
+      "query_accuracy": 0.7499999701976776
+    },
+    {
+      "episode": 447,
+      "meta_loss": 1.6083048582077026,
+      "query_accuracy": 0.6799999997019768
+    },
+    {
+      "episode": 448,
+      "meta_loss": 1.6083461046218872,
+      "query_accuracy": 0.6599999815225601
+    },
+    {
+      "episode": 449,
+      "meta_loss": 1.608108013868332,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 450,
+      "meta_loss": 1.6081217229366302,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 451,
+      "meta_loss": 1.6077295243740082,
+      "query_accuracy": 0.7799999788403511
+    },
+    {
+      "episode": 452,
+      "meta_loss": 1.6076681017875671,
+      "query_accuracy": 0.7499999701976776
+    },
+    {
+      "episode": 453,
+      "meta_loss": 1.6083602905273438,
+      "query_accuracy": 0.4999999813735485
+    },
+    {
+      "episode": 454,
+      "meta_loss": 1.6088230311870575,
+      "query_accuracy": 0.559999980032444
+    },
+    {
+      "episode": 455,
+      "meta_loss": 1.608305662870407,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 456,
+      "meta_loss": 1.6076606810092926,
+      "query_accuracy": 0.7599999904632568
+    },
+    {
+      "episode": 457,
+      "meta_loss": 1.608029693365097,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 458,
+      "meta_loss": 1.6083843111991882,
+      "query_accuracy": 0.6699999794363976
+    },
+    {
+      "episode": 459,
+      "meta_loss": 1.6077559888362885,
+      "query_accuracy": 0.8299999833106995
+    },
+    {
+      "episode": 460,
+      "meta_loss": 1.6083048582077026,
+      "query_accuracy": 0.6899999976158142
+    },
+    {
+      "episode": 461,
+      "meta_loss": 1.607975572347641,
+      "query_accuracy": 0.7199999839067459
+    },
+    {
+      "episode": 462,
+      "meta_loss": 1.607531726360321,
+      "query_accuracy": 0.8099999874830246
+    },
+    {
+      "episode": 463,
+      "meta_loss": 1.6075489819049835,
+      "query_accuracy": 0.8099999725818634
+    },
+    {
+      "episode": 464,
+      "meta_loss": 1.6079863607883453,
+      "query_accuracy": 0.6699999868869781
+    },
+    {
+      "episode": 465,
+      "meta_loss": 1.6084948182106018,
+      "query_accuracy": 0.5999999791383743
+    },
+    {
+      "episode": 466,
+      "meta_loss": 1.6087161302566528,
+      "query_accuracy": 0.6399999707937241
+    },
+    {
+      "episode": 467,
+      "meta_loss": 1.6082047522068024,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 468,
+      "meta_loss": 1.6080243587493896,
+      "query_accuracy": 0.6899999976158142
+    },
+    {
+      "episode": 469,
+      "meta_loss": 1.6080698072910309,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 470,
+      "meta_loss": 1.6078991293907166,
+      "query_accuracy": 0.6699999868869781
+    },
+    {
+      "episode": 471,
+      "meta_loss": 1.607795774936676,
+      "query_accuracy": 0.6999999731779099
+    },
+    {
+      "episode": 472,
+      "meta_loss": 1.6085589826107025,
+      "query_accuracy": 0.6400000005960464
+    },
+    {
+      "episode": 473,
+      "meta_loss": 1.6084249317646027,
+      "query_accuracy": 0.6099999770522118
+    },
+    {
+      "episode": 474,
+      "meta_loss": 1.607903778553009,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 475,
+      "meta_loss": 1.6086366176605225,
+      "query_accuracy": 0.5799999833106995
+    },
+    {
+      "episode": 476,
+      "meta_loss": 1.607746958732605,
+      "query_accuracy": 0.7599999755620956
+    },
+    {
+      "episode": 477,
+      "meta_loss": 1.6079861521720886,
+      "query_accuracy": 0.6899999752640724
+    },
+    {
+      "episode": 478,
+      "meta_loss": 1.6086019575595856,
+      "query_accuracy": 0.5999999940395355
+    },
+    {
+      "episode": 479,
+      "meta_loss": 1.6080800890922546,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 480,
+      "meta_loss": 1.6072636544704437,
+      "query_accuracy": 0.8199999779462814
+    },
+    {
+      "episode": 481,
+      "meta_loss": 1.6088313460350037,
+      "query_accuracy": 0.5499999895691872
+    },
+    {
+      "episode": 482,
+      "meta_loss": 1.6074145138263702,
+      "query_accuracy": 0.7199999764561653
+    },
+    {
+      "episode": 483,
+      "meta_loss": 1.6079880893230438,
+      "query_accuracy": 0.699999988079071
+    },
+    {
+      "episode": 484,
+      "meta_loss": 1.607480376958847,
+      "query_accuracy": 0.7899999767541885
+    },
+    {
+      "episode": 485,
+      "meta_loss": 1.607922375202179,
+      "query_accuracy": 0.7199999690055847
+    },
+    {
+      "episode": 486,
+      "meta_loss": 1.6080507636070251,
+      "query_accuracy": 0.669999971985817
+    },
+    {
+      "episode": 487,
+      "meta_loss": 1.6082934737205505,
+      "query_accuracy": 0.6499999761581421
+    },
+    {
+      "episode": 488,
+      "meta_loss": 1.6076482236385345,
+      "query_accuracy": 0.7299999818205833
+    },
+    {
+      "episode": 489,
+      "meta_loss": 1.6080221235752106,
+      "query_accuracy": 0.7899999916553497
+    },
+    {
+      "episode": 490,
+      "meta_loss": 1.6082462966442108,
+      "query_accuracy": 0.5199999883770943
+    },
+    {
+      "episode": 491,
+      "meta_loss": 1.6075520813465118,
+      "query_accuracy": 0.7799999862909317
+    },
+    {
+      "episode": 492,
+      "meta_loss": 1.6073506474494934,
+      "query_accuracy": 0.7799999862909317
+    },
+    {
+      "episode": 493,
+      "meta_loss": 1.608326017856598,
+      "query_accuracy": 0.5999999865889549
+    },
+    {
+      "episode": 494,
+      "meta_loss": 1.6084186434745789,
+      "query_accuracy": 0.6599999666213989
+    },
+    {
+      "episode": 495,
+      "meta_loss": 1.6082250773906708,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 496,
+      "meta_loss": 1.6080279350280762,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 497,
+      "meta_loss": 1.6085446774959564,
+      "query_accuracy": 0.6299999877810478
+    },
+    {
+      "episode": 498,
+      "meta_loss": 1.607789158821106,
+      "query_accuracy": 0.7399999722838402
+    },
+    {
+      "episode": 499,
+      "meta_loss": 1.6086198389530182,
+      "query_accuracy": 0.5899999886751175
+    },
+    {
+      "episode": 500,
+      "meta_loss": 1.6078584790229797,
+      "query_accuracy": 0.7399999648332596
+    },
+    {
+      "episode": 501,
+      "meta_loss": 1.607604056596756,
+      "query_accuracy": 0.7499999701976776
+    },
+    {
+      "episode": 502,
+      "meta_loss": 1.608028382062912,
+      "query_accuracy": 0.6599999964237213
+    },
+    {
+      "episode": 503,
+      "meta_loss": 1.608062505722046,
+      "query_accuracy": 0.7399999648332596
+    },
+    {
+      "episode": 504,
+      "meta_loss": 1.6078954935073853,
+      "query_accuracy": 0.7599999755620956
+    },
+    {
+      "episode": 505,
+      "meta_loss": 1.6082687675952911,
+      "query_accuracy": 0.6799999848008156
+    },
+    {
+      "episode": 506,
+      "meta_loss": 1.6080308258533478,
+      "query_accuracy": 0.7499999701976776
+    },
+    {
+      "episode": 507,
+      "meta_loss": 1.6072821915149689,
+      "query_accuracy": 0.8299999907612801
+    },
+    {
+      "episode": 508,
+      "meta_loss": 1.6078399419784546,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 509,
+      "meta_loss": 1.6078716218471527,
+      "query_accuracy": 0.7799999862909317
+    },
+    {
+      "episode": 510,
+      "meta_loss": 1.607662856578827,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 511,
+      "meta_loss": 1.6082357466220856,
+      "query_accuracy": 0.6699999868869781
+    },
+    {
+      "episode": 512,
+      "meta_loss": 1.6085169911384583,
+      "query_accuracy": 0.5599999949336052
+    },
+    {
+      "episode": 513,
+      "meta_loss": 1.6077003180980682,
+      "query_accuracy": 0.6099999770522118
+    },
+    {
+      "episode": 514,
+      "meta_loss": 1.607663094997406,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 515,
+      "meta_loss": 1.607949137687683,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 516,
+      "meta_loss": 1.6078196465969086,
+      "query_accuracy": 0.7099999934434891
+    },
+    {
+      "episode": 517,
+      "meta_loss": 1.6075361371040344,
+      "query_accuracy": 0.8199999779462814
+    },
+    {
+      "episode": 518,
+      "meta_loss": 1.60809525847435,
+      "query_accuracy": 0.7499999850988388
+    },
+    {
+      "episode": 519,
+      "meta_loss": 1.607630580663681,
+      "query_accuracy": 0.7899999767541885
+    },
+    {
+      "episode": 520,
+      "meta_loss": 1.607241451740265,
+      "query_accuracy": 0.7299999818205833
+    },
+    {
+      "episode": 521,
+      "meta_loss": 1.6081849932670593,
+      "query_accuracy": 0.6399999707937241
+    },
+    {
+      "episode": 522,
+      "meta_loss": 1.6073063611984253,
+      "query_accuracy": 0.7899999618530273
+    },
+    {
+      "episode": 523,
+      "meta_loss": 1.6083824932575226,
+      "query_accuracy": 0.5899999961256981
+    },
+    {
+      "episode": 524,
+      "meta_loss": 1.6081534028053284,
+      "query_accuracy": 0.7199999839067459
+    },
+    {
+      "episode": 525,
+      "meta_loss": 1.6083272695541382,
+      "query_accuracy": 0.689999982714653
+    },
+    {
+      "episode": 526,
+      "meta_loss": 1.6076053082942963,
+      "query_accuracy": 0.7799999713897705
+    },
+    {
+      "episode": 527,
+      "meta_loss": 1.608169049024582,
+      "query_accuracy": 0.7299999892711639
+    },
+    {
+      "episode": 528,
+      "meta_loss": 1.6087642014026642,
+      "query_accuracy": 0.5999999791383743
+    },
+    {
+      "episode": 529,
+      "meta_loss": 1.6076746881008148,
+      "query_accuracy": 0.7999999821186066
+    },
+    {
+      "episode": 530,
+      "meta_loss": 1.607917994260788,
+      "query_accuracy": 0.7699999660253525
+    },
+    {
+      "episode": 531,
+      "meta_loss": 1.6081973016262054,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 532,
+      "meta_loss": 1.6078541278839111,
+      "query_accuracy": 0.7599999904632568
+    },
+    {
+      "episode": 533,
+      "meta_loss": 1.6080064475536346,
+      "query_accuracy": 0.7499999850988388
+    },
+    {
+      "episode": 534,
+      "meta_loss": 1.6080169677734375,
+      "query_accuracy": 0.6999999806284904
+    },
+    {
+      "episode": 535,
+      "meta_loss": 1.6076411604881287,
+      "query_accuracy": 0.7099999934434891
+    },
+    {
+      "episode": 536,
+      "meta_loss": 1.6083405315876007,
+      "query_accuracy": 0.7199999690055847
+    },
+    {
+      "episode": 537,
+      "meta_loss": 1.607893317937851,
+      "query_accuracy": 0.6399999931454659
+    },
+    {
+      "episode": 538,
+      "meta_loss": 1.6079930663108826,
+      "query_accuracy": 0.7399999797344208
+    },
+    {
+      "episode": 539,
+      "meta_loss": 1.6069026291370392,
+      "query_accuracy": 0.919999971985817
+    },
+    {
+      "episode": 540,
+      "meta_loss": 1.607342779636383,
+      "query_accuracy": 0.8299999982118607
+    },
+    {
+      "episode": 541,
+      "meta_loss": 1.6079343557357788,
+      "query_accuracy": 0.7099999785423279
+    },
+    {
+      "episode": 542,
+      "meta_loss": 1.6082524359226227,
+      "query_accuracy": 0.7299999743700027
+    },
+    {
+      "episode": 543,
+      "meta_loss": 1.6083960235118866,
+      "query_accuracy": 0.679999977350235
+    },
+    {
+      "episode": 544,
+      "meta_loss": 1.6071979403495789,
+      "query_accuracy": 0.8199999928474426
+    },
+    {
+      "episode": 545,
+      "meta_loss": 1.607361078262329,
+      "query_accuracy": 0.8499999791383743
+    },
+    {
+      "episode": 546,
+      "meta_loss": 1.607446163892746,
+      "query_accuracy": 0.8099999874830246
+    },
+    {
+      "episode": 547,
+      "meta_loss": 1.6076855957508087,
+      "query_accuracy": 0.7099999934434891
+    },
+    {
+      "episode": 548,
+      "meta_loss": 1.6084207892417908,
+      "query_accuracy": 0.669999971985817
+    },
+    {
+      "episode": 549,
+      "meta_loss": 1.607719600200653,
+      "query_accuracy": 0.7499999850988388
+    },
+    {
+      "episode": 550,
+      "meta_loss": 1.607212871313095,
+      "query_accuracy": 0.8099999874830246
+    }
+  ]
+}
