@@ -95,6 +95,12 @@ def parse_args():
         default=200,
         help="DPI resolution for raster output (default: 200)",
     )
+    parser.add_argument(
+        "--plot-summary",
+        action="store_true",
+        default=True,
+        help="Also plot summary comparison of steps/epochs to reach 95% peak accuracy (default: True)",
+    )
     return parser.parse_args()
 
 
@@ -370,6 +376,203 @@ def plot_target_adaptation(
     plt.close(fig)
 
 
+def plot_time_to_95_summary(
+    by_target: Dict[str, List[Dict[str, Any]]],
+    output_path: Path,
+    threshold: float = 0.95,
+    save_svg: bool = False,
+    dpi: int = 200,
+):
+    """
+    Generates a dedicated summary visualization for the time (optimizer steps and epochs)
+    required to reach 95% of peak accuracy across all target domains.
+    """
+    pct_label = f"{threshold * 100:.0f}%" if threshold == int(threshold * 100) / 100 else f"{threshold * 100:.1f}%"
+    domain_colors = {
+        "clipart": "#1f77b4",
+        "infograph": "#ff7f0e",
+        "painting": "#2ca02c",
+        "quickdraw": "#d62728",
+        "real": "#9467bd",
+        "sketch": "#8c564b",
+    }
+
+    # Extract crossing steps and epochs for each run
+    summary_data: Dict[str, List[Dict[str, Any]]] = {d: [] for d in DOMAINS}
+
+    for target in DOMAINS:
+        runs = by_target.get(target, [])
+        steps_per_ep = STEPS_PER_EPOCH.get(target, 250)
+
+        for run in runs:
+            history = sorted(run["history"], key=lambda h: h.get("step", h.get("epoch", 0)))
+            init_acc = run["initial_accuracy"]
+            peak_acc = max(h["test_accuracy"] for h in history)
+            target_thresh = threshold * peak_acc
+
+            # Interpolate crossing step
+            pts = [(0.0, init_acc)] + [
+                (float(h.get("step", h.get("epoch", 0) * steps_per_ep)), float(h["test_accuracy"]))
+                for h in history
+            ]
+            interp_step = None
+            for i in range(len(pts) - 1):
+                x1, y1 = pts[i]
+                x2, y2 = pts[i + 1]
+                if y1 <= target_thresh <= y2 and y2 > y1:
+                    frac = (target_thresh - y1) / (y2 - y1)
+                    interp_step = x1 + frac * (x2 - x1)
+                    break
+                elif y1 >= target_thresh:
+                    interp_step = x1
+                    break
+
+            crossing_epoch = None
+            for h in history:
+                if h.get("test_accuracy", 0.0) >= target_thresh:
+                    crossing_epoch = h.get("epoch", 0)
+                    break
+
+            summary_data[target].append({
+                "pair": run["pair_label"],
+                "peak_acc": peak_acc,
+                "step": interp_step,
+                "epoch": crossing_epoch,
+            })
+
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6), gridspec_kw={"width_ratios": [1.15, 1]})
+    fig.suptitle(
+        f"Time to Reach {pct_label} of Peak Accuracy across DomainNet Target Domains",
+        fontsize=13.5,
+        fontweight="bold",
+        y=0.98,
+    )
+
+    # Panel 1: Steps to 95% Peak
+    ax1 = axes[0]
+    positions = list(range(len(DOMAINS)))
+    means_steps = []
+    stds_steps = []
+
+    import random
+    rng = random.Random(42)
+
+    for idx, d in enumerate(DOMAINS):
+        items = summary_data[d]
+        steps = [it["step"] for it in items if it["step"] is not None]
+        mean_step = sum(steps) / len(steps) if steps else 0.0
+        var_step = sum((x - mean_step) ** 2 for x in steps) / len(steps) if steps else 0.0
+        std_step = var_step ** 0.5
+        means_steps.append(mean_step)
+        stds_steps.append(std_step)
+
+        color = domain_colors.get(d, "#333333")
+
+        # Bar
+        ax1.bar(
+            idx,
+            mean_step,
+            width=0.55,
+            color=color,
+            alpha=0.35,
+            edgecolor=color,
+            linewidth=1.5,
+            zorder=2,
+        )
+
+        # Individual scatter points with jitter
+        for s in steps:
+            jitter = rng.uniform(-0.15, 0.15)
+            ax1.scatter(
+                idx + jitter,
+                s,
+                color=color,
+                s=42,
+                alpha=0.85,
+                edgecolor="white",
+                linewidth=0.6,
+                zorder=4,
+            )
+
+        epochs = [it["epoch"] for it in items if it["epoch"] is not None]
+        mean_ep = sum(epochs) / len(epochs) if epochs else 0.0
+        ax1.text(
+            idx,
+            mean_step + std_step + 30,
+            f"{mean_step:.0f} steps\n({mean_ep:.1f} ep)",
+            ha="center",
+            va="bottom",
+            fontsize=8.5,
+            fontweight="semibold",
+            color="#222222",
+        )
+
+    ax1.errorbar(
+        positions,
+        means_steps,
+        yerr=stds_steps,
+        fmt="none",
+        ecolor="#333333",
+        elinewidth=1.6,
+        capsize=5,
+        capthick=1.4,
+        zorder=3,
+    )
+
+    ax1.set_xticks(positions)
+    ax1.set_xticklabels([d.capitalize() for d in DOMAINS], fontsize=11, fontweight="medium")
+    ax1.set_ylabel(f"Optimizer Steps to reach {pct_label} Peak Accuracy", fontsize=10.5)
+    ax1.set_title(f"A. Optimizer Steps to {pct_label} Peak (Mean ± Std & Individual Pairs)", fontsize=11.5, pad=10)
+    ax1.grid(axis="y", linestyle="--", alpha=0.5, zorder=0)
+    ax1.set_ylim(0, 1650)
+
+    # Panel 2: Epochs Distribution
+    ax2 = axes[1]
+    all_epochs = sorted(set(it["epoch"] for d in DOMAINS for it in summary_data[d] if it["epoch"] is not None))
+    bottom = [0.0] * len(DOMAINS)
+    cmap = plt.get_cmap("viridis")
+
+    for i, ep in enumerate(all_epochs):
+        counts = []
+        for d in DOMAINS:
+            cnt = sum(1 for it in summary_data[d] if it["epoch"] == ep)
+            counts.append(cnt)
+        c = cmap(i / max(1, len(all_epochs) - 1) * 0.8 + 0.1)
+        ax2.bar(
+            positions,
+            counts,
+            bottom=bottom,
+            width=0.55,
+            label=f"{ep} Epochs",
+            color=c,
+            edgecolor="white",
+            linewidth=0.8,
+            zorder=2,
+        )
+        bottom = [b + c_val for b, c_val in zip(bottom, counts)]
+
+    ax2.set_xticks(positions)
+    ax2.set_xticklabels([d.capitalize() for d in DOMAINS], fontsize=11, fontweight="medium")
+    ax2.set_ylabel("Number of Source Pairs (out of 10)", fontsize=10.5)
+    ax2.set_yticks(list(range(0, 11, 2)))
+    ax2.set_title(f"B. Epochs Required to Reach {pct_label} Peak Accuracy", fontsize=11.5, pad=10)
+    ax2.grid(axis="y", linestyle="--", alpha=0.5, zorder=0)
+    ax2.legend(title="Epochs to 95%", loc="upper right", framealpha=0.92)
+
+    plt.tight_layout(rect=[0.02, 0.02, 0.98, 0.94])
+
+    summary_png = output_path.parent / "time_to_95_peak_summary.png"
+    plt.savefig(str(summary_png.resolve()), dpi=dpi, bbox_inches="tight")
+    print(f"Saved time-to-95 summary figure to: {summary_png}")
+
+    if save_svg:
+        summary_svg = output_path.parent / "time_to_95_peak_summary.svg"
+        plt.savefig(str(summary_svg.resolve()), format="svg", bbox_inches="tight")
+        print(f"Saved time-to-95 summary SVG to: {summary_svg}")
+
+    plt.close(fig)
+
+
 def main():
     args = parse_args()
     if not args.results_dir.exists():
@@ -392,6 +595,15 @@ def main():
         save_svg=args.save_svg,
         dpi=args.dpi,
     )
+
+    if args.plot_summary:
+        plot_time_to_95_summary(
+            by_target=by_target,
+            output_path=args.output,
+            threshold=args.threshold,
+            save_svg=args.save_svg,
+            dpi=args.dpi,
+        )
 
 
 if __name__ == "__main__":
