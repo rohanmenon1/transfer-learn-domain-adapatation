@@ -37,6 +37,7 @@ def parse_args():
 
     p.add_argument("--per-class", type=int, default=50)
     p.add_argument("--epochs", type=int, default=10)
+    p.add_argument("--eval-every", type=int, default=100, help="Evaluate test accuracy every N optimizer steps")
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--lr", type=float, default=3e-5)
     p.add_argument("--head-lr", type=float, default=1e-3)
@@ -199,42 +200,92 @@ def fine_tune_domain(args, domain, maml_checkpoint):
         lambda step: min((step + 1) / warmup_steps, 1.0),
     )
 
+    global_step = 0
     history = []
 
     # Evaluate the initialized model before fine-tuning.
     initial_accuracy = accuracy(model, test)
     torch.cuda.empty_cache()
 
-    print(f"Initial accuracy: {initial_accuracy:.4f}")
+    print(f"Initial accuracy (step 0): {initial_accuracy:.4f}")
+    history.append({
+        "step": 0,
+        "epoch": 0,
+        "train_loss": None,
+        "train_accuracy": None,
+        "test_accuracy": initial_accuracy,
+    })
 
     for epoch in range(1, args.epochs + 1):
         torch.cuda.reset_peak_memory_stats()
+        model.train()
+        total_loss = 0.0
+        total_correct = 0
+        total_samples = 0
 
-        train_metrics = train_one_epoch(
-            model,
-            train,
-            optimizer,
-            scheduler,
-        )
+        for x, y in train:
+            x = x.cuda(non_blocking=True)
+            y = y.cuda(non_blocking=True)
 
-        test_accuracy = accuracy(model, test)
-        torch.cuda.empty_cache()
+            optimizer.zero_grad(set_to_none=True)
 
-        record = {
-            "epoch": epoch,
-            **train_metrics,
-            "test_accuracy": test_accuracy,
-        }
+            with torch.autocast("cuda", dtype=torch.bfloat16):
+                logits = model(x)
+                loss = F.cross_entropy(logits.float(), y)
 
-        history.append(record)
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
+            global_step += 1
 
-        print(
-            f"Epoch {epoch:3d}/{args.epochs} | "
-            f"loss {train_metrics['train_loss']:.4f} | "
-            f"train acc {train_metrics['train_accuracy']:.4f} | "
-            f"test acc {test_accuracy:.4f}",
-            flush=True,
-        )
+            total_loss += loss.item() * y.size(0)
+            total_correct += (logits.argmax(1) == y).sum().item()
+            total_samples += y.size(0)
+
+            # Step-level evaluation if eval_every is specified
+            if args.eval_every and (global_step % args.eval_every == 0):
+                test_accuracy = accuracy(model, test)
+                torch.cuda.empty_cache()
+                model.train()
+
+                record = {
+                    "step": global_step,
+                    "epoch": epoch,
+                    "train_loss": total_loss / total_samples,
+                    "train_accuracy": total_correct / total_samples,
+                    "test_accuracy": test_accuracy,
+                }
+                history.append(record)
+
+                print(
+                    f"Step {global_step:4d} (Epoch {epoch:2d}/{args.epochs}) | "
+                    f"loss {record['train_loss']:.4f} | "
+                    f"train acc {record['train_accuracy']:.4f} | "
+                    f"test acc {test_accuracy:.4f}",
+                    flush=True,
+                )
+
+        # End of epoch evaluation if not just evaluated at this exact step
+        if not history or history[-1]["step"] != global_step:
+            test_accuracy = accuracy(model, test)
+            torch.cuda.empty_cache()
+
+            record = {
+                "step": global_step,
+                "epoch": epoch,
+                "train_loss": total_loss / total_samples,
+                "train_accuracy": total_correct / total_samples,
+                "test_accuracy": test_accuracy,
+            }
+            history.append(record)
+
+            print(
+                f"Epoch {epoch:3d}/{args.epochs} (Step {global_step:4d}) | "
+                f"loss {record['train_loss']:.4f} | "
+                f"train acc {record['train_accuracy']:.4f} | "
+                f"test acc {test_accuracy:.4f}",
+                flush=True,
+            )
 
     # Save model and metrics independently for each domain.
     output_name = (
@@ -250,11 +301,21 @@ def fine_tune_domain(args, domain, maml_checkpoint):
         f"models/{output_name}.pt",
     )
 
+    peak_accuracy = max(h["test_accuracy"] for h in history)
+    thresh_95 = 0.95 * peak_accuracy
+    converged_at_step = next(
+        (h["step"] for h in history if h["test_accuracy"] >= thresh_95),
+        None,
+    )
+
     result = {
         "args": vars(args),
         "domain": domain,
+        "steps_per_epoch": len(train),
         "initial_accuracy": initial_accuracy,
         "final_accuracy": history[-1]["test_accuracy"],
+        "peak_accuracy": peak_accuracy,
+        "converged_at_step": converged_at_step,
         "history": history,
     }
 

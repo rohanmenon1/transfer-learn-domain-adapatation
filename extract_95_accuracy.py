@@ -18,6 +18,15 @@ import math
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+STEPS_PER_EPOCH = {
+    "clipart": 248,
+    "infograph": 230,
+    "painting": 237,
+    "quickdraw": 269,
+    "real": 268,
+    "sketch": 255,
+}
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -121,6 +130,24 @@ def process_result_file(file_path: Path, threshold_fraction: float) -> Optional[
                 acc_at_threshold_epoch = test_acc
                 break
 
+    # Calculate continuous interpolated step to 95% threshold
+    steps_per_ep = data.get("steps_per_epoch", STEPS_PER_EPOCH.get(target, 250))
+    pts = [(0.0, initial_acc)] + [
+        (float(entry.get("step", entry.get("epoch", 0) * steps_per_ep)), float(entry.get("test_accuracy", 0.0)))
+        for entry in sorted(history, key=lambda x: x.get("epoch", 0))
+    ]
+    interp_step: Optional[float] = None
+    for i in range(len(pts) - 1):
+        x1, y1 = pts[i]
+        x2, y2 = pts[i + 1]
+        if y1 <= threshold_value <= y2 and y2 > y1:
+            frac = (threshold_value - y1) / (y2 - y1)
+            interp_step = round(x1 + frac * (x2 - x1), 1)
+            break
+        elif y1 >= threshold_value:
+            interp_step = x1
+            break
+
     # Also compute 95% of total improvement (from initial to peak) as additional context
     improvement = peak_acc - initial_acc
     improvement_95_threshold = initial_acc + (threshold_fraction * improvement)
@@ -146,6 +173,8 @@ def process_result_file(file_path: Path, threshold_fraction: float) -> Optional[
         "threshold_fraction": threshold_fraction,
         "target_95_accuracy": threshold_value,
         "epochs_to_95_peak": epochs_to_threshold,
+        "steps_to_95_peak": interp_step,
+        "steps_per_epoch": steps_per_ep,
         "accuracy_at_95_epoch": acc_at_threshold_epoch,
         "final_accuracy": final_acc,
         "total_improvement": peak_acc - initial_acc,
@@ -238,6 +267,7 @@ def main():
             "threshold_fraction",
             "target_95_accuracy",
             "epochs_to_95_peak",
+            "steps_to_95_peak",
             "accuracy_at_95_epoch",
             "final_accuracy",
             "total_improvement",

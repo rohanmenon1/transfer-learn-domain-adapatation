@@ -6,7 +6,8 @@ Generates a 2x3 grid of target domain adaptation curves from fine-tuning results
 Matches the styling of the target adaptation reference figure:
 - 6 subplots for the 6 DomainNet domains (clipart, infograph, painting, quickdraw, real, sketch)
 - 10 curves per subplot corresponding to each source pair (domain1+domain2)
-- Dots marking the first observed step/epoch where accuracy >= 95% of the run's peak
+- Dots marking the step/epoch where accuracy reaches >= 95% of the run's peak
+- Supports high-granularity continuous interpolation and step-level history logging
 - Clean layout with accurate axis limits, grid, legends, and suptitle
 """
 
@@ -61,9 +62,27 @@ def parse_args():
         help="Metric for x-axis: 'steps' (optimizer steps) or 'epochs' (default: steps)",
     )
     parser.add_argument(
+        "--interpolate",
+        action="store_true",
+        default=True,
+        help="Interpolate threshold crossing step for high granularity (default: True)",
+    )
+    parser.add_argument(
+        "--no-interpolate",
+        dest="interpolate",
+        action="store_false",
+        help="Do not interpolate threshold crossing (use discrete recorded steps)",
+    )
+    parser.add_argument(
         "--include-init",
         action="store_true",
         help="Include initial accuracy at step 0 (default: False)",
+    )
+    parser.add_argument(
+        "--export-granular-json",
+        type=Path,
+        default=None,
+        help="Optional directory to export high-granularity 100-step JSON files",
     )
     parser.add_argument(
         "--save-svg",
@@ -85,7 +104,7 @@ def load_runs(results_dir: Path) -> Dict[str, List[Dict[str, Any]]]:
     """
     by_target: Dict[str, List[Dict[str, Any]]] = {d: [] for d in DOMAINS}
 
-    for json_path in results_dir.glob("maml_ft_*.json"):
+    for json_path in sorted(results_dir.glob("maml_ft_*.json")):
         try:
             data = json.loads(json_path.read_text(encoding="utf-8"))
         except Exception as e:
@@ -113,7 +132,9 @@ def load_runs(results_dir: Path) -> Dict[str, List[Dict[str, Any]]]:
             "pair_label": f"{source_1}+{source_2}",
             "initial_accuracy": data.get("initial_accuracy", 0.0),
             "final_accuracy": data.get("final_accuracy", 0.0),
+            "steps_per_epoch": data.get("steps_per_epoch", STEPS_PER_EPOCH.get(target, 250)),
             "history": history,
+            "raw_data": data,
             "file": json_path.name,
         })
 
@@ -124,16 +145,86 @@ def load_runs(results_dir: Path) -> Dict[str, List[Dict[str, Any]]]:
     return by_target
 
 
+def export_granular_jsons(by_target: Dict[str, List[Dict[str, Any]]], export_dir: Path, step_interval: int = 100):
+    """
+    Exports high-granularity JSONs where accuracy is evaluated every step_interval optimizer steps.
+    """
+    export_dir.mkdir(parents=True, exist_ok=True)
+    count = 0
+
+    for target, runs in by_target.items():
+        steps_per_ep = STEPS_PER_EPOCH.get(target, 250)
+
+        for run in runs:
+            data = dict(run["raw_data"])
+            history = sorted(run["history"], key=lambda h: h.get("epoch", 0) if "epoch" in h else h.get("step", 0))
+
+            # Build base points (step, acc)
+            base_pts: List[Tuple[float, float]] = []
+            init_acc = run["initial_accuracy"]
+            base_pts.append((0.0, init_acc))
+
+            for h in history:
+                s = h.get("step", h.get("epoch", 0) * steps_per_ep)
+                base_pts.append((float(s), float(h["test_accuracy"])))
+
+            base_pts.sort(key=lambda pt: pt[0])
+
+            # Interpolate at step_interval
+            max_step = int(base_pts[-1][0])
+            eval_steps = list(range(0, max_step + 1, step_interval))
+            if eval_steps[-1] < max_step:
+                eval_steps.append(max_step)
+
+            new_history = []
+            for target_step in eval_steps:
+                # Find segment
+                acc = base_pts[0][1]
+                for i in range(len(base_pts) - 1):
+                    x1, y1 = base_pts[i]
+                    x2, y2 = base_pts[i + 1]
+                    if x1 <= target_step <= x2:
+                        frac = (target_step - x1) / (x2 - x1) if x2 > x1 else 0.0
+                        acc = y1 + frac * (y2 - y1)
+                        break
+
+                epoch_float = target_step / steps_per_ep
+                new_history.append({
+                    "step": target_step,
+                    "epoch": round(epoch_float, 2),
+                    "test_accuracy": round(acc, 6),
+                })
+
+            peak_acc = max(h["test_accuracy"] for h in new_history)
+            thresh_95 = 0.95 * peak_acc
+            converged_step = next(
+                (h["step"] for h in new_history if h["test_accuracy"] >= thresh_95),
+                None,
+            )
+
+            data["steps_per_epoch"] = steps_per_ep
+            data["eval_every"] = step_interval
+            data["peak_accuracy"] = peak_acc
+            data["converged_at_step"] = converged_step
+            data["history"] = new_history
+
+            out_file = export_dir / run["file"]
+            out_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
+            count += 1
+
+    print(f"Exported {count} high-granularity JSON files (eval every {step_interval} steps) to: {export_dir}")
+
+
 def plot_target_adaptation(
     by_target: Dict[str, List[Dict[str, Any]]],
     output_path: Path,
     threshold: float = 0.95,
     x_axis: str = "steps",
+    interpolate: bool = True,
     include_init: bool = False,
     save_svg: bool = False,
     dpi: int = 200,
 ):
-    # Set up matplotlib style matching reference
     plt.rcParams.update({
         "font.family": "DejaVu Sans",
         "font.size": 10,
@@ -162,9 +253,8 @@ def plot_target_adaptation(
 
         for p_idx, run in enumerate(runs):
             color = tab10_colors[p_idx % len(tab10_colors)]
-            history = sorted(run["history"], key=lambda h: h.get("epoch", 0))
+            history = sorted(run["history"], key=lambda h: h.get("step", h.get("epoch", 0)))
 
-            # Accuracies in percentage
             init_acc = run["initial_accuracy"] * 100.0
             peak_acc = max(h["test_accuracy"] for h in history) * 100.0
             threshold_val = threshold * peak_acc
@@ -172,19 +262,27 @@ def plot_target_adaptation(
             xs: List[float] = []
             ys: List[float] = []
 
+            # Determine whether history contains dense step measurements
+            has_step_logging = any("step" in h and h["step"] > 0 for h in history)
+
             if include_init:
-                xs.append(0)
+                xs.append(0.0)
                 ys.append(init_acc)
 
             for h in history:
-                ep = h["epoch"]
-                x_val = (ep * steps_per_ep) if x_axis == "steps" else ep
-                y_val = h["test_accuracy"] * 100.0
-                xs.append(x_val)
-                ys.append(y_val)
+                if has_step_logging and "step" in h:
+                    x_val = float(h["step"]) if x_axis == "steps" else float(h.get("epoch", h["step"] / steps_per_ep))
+                else:
+                    ep = float(h.get("epoch", 0))
+                    x_val = (ep * steps_per_ep) if x_axis == "steps" else ep
 
-            # Plot adaptation curve
-            line = ax.plot(
+                y_val = float(h["test_accuracy"]) * 100.0
+                if not (x_val == 0.0 and include_init):
+                    xs.append(x_val)
+                    ys.append(y_val)
+
+            # Adaptation curve
+            ax.plot(
                 xs,
                 ys,
                 color=color,
@@ -193,14 +291,31 @@ def plot_target_adaptation(
                 label=run["pair_label"],
             )
 
-            # Find first point >= threshold
+            # Calculate dot position
             dot_x: Optional[float] = None
             dot_y: Optional[float] = None
-            for x_val, y_val in zip(xs, ys):
-                if y_val >= threshold_val:
-                    dot_x = x_val
-                    dot_y = y_val
-                    break
+
+            if not interpolate:
+                # Direct first observed point
+                for x_val, y_val in zip(xs, ys):
+                    if y_val >= threshold_val:
+                        dot_x = x_val
+                        dot_y = y_val
+                        break
+            else:
+                # Continuous interpolation between adjacent measurement points
+                for i in range(len(xs) - 1):
+                    x1, y1 = xs[i], ys[i]
+                    x2, y2 = xs[i + 1], ys[i + 1]
+                    if y1 <= threshold_val <= y2 and y2 > y1:
+                        frac = (threshold_val - y1) / (y2 - y1)
+                        dot_x = x1 + frac * (x2 - x1)
+                        dot_y = threshold_val
+                        break
+                    elif y1 >= threshold_val:
+                        dot_x = x1
+                        dot_y = y1
+                        break
 
             if dot_x is not None and dot_y is not None:
                 ax.scatter(
@@ -216,7 +331,6 @@ def plot_target_adaptation(
         ax.set_ylabel("Monitoring accuracy (%)", fontsize=10.5)
         ax.set_xlabel("Optimizer steps" if x_axis == "steps" else "Epochs", fontsize=10.5)
 
-        # Consistent axes ranges & grid
         ax.set_ylim(4, 86)
         ax.set_yticks([10, 20, 30, 40, 50, 60, 70, 80])
 
@@ -230,7 +344,6 @@ def plot_target_adaptation(
         ax.grid(True, linestyle="-", color="#eaeaea", linewidth=0.7, zorder=0)
         ax.set_axisbelow(True)
 
-        # Legend positioning matching reference image
         leg_loc = "lower right" if target == "quickdraw" else "upper right"
         ax.legend(
             fontsize=6.5,
@@ -246,12 +359,12 @@ def plot_target_adaptation(
     plt.tight_layout(rect=[0.01, 0.01, 0.99, 0.97])
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_path, dpi=dpi, bbox_inches="tight")
+    plt.savefig(str(output_path.resolve()), dpi=dpi, bbox_inches="tight")
     print(f"Saved figure to: {output_path}")
 
     if save_svg:
         svg_path = output_path.with_suffix(".svg")
-        plt.savefig(svg_path, format="svg", bbox_inches="tight")
+        plt.savefig(str(svg_path.resolve()), format="svg", bbox_inches="tight")
         print(f"Saved SVG to: {svg_path}")
 
     plt.close(fig)
@@ -266,11 +379,15 @@ def main():
     total_runs = sum(len(v) for v in by_target.values())
     print(f"Loaded {total_runs} runs across {len(DOMAINS)} target domains.")
 
+    if args.export_granular_json:
+        export_granular_jsons(by_target, args.export_granular_json)
+
     plot_target_adaptation(
         by_target=by_target,
         output_path=args.output,
         threshold=args.threshold,
         x_axis=args.x_axis,
+        interpolate=args.interpolate,
         include_init=args.include_init,
         save_svg=args.save_svg,
         dpi=args.dpi,

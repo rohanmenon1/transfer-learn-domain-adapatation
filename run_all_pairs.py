@@ -27,6 +27,7 @@ META_BATCH = 4
 
 PER_CLASS = 50
 EPOCHS = 10
+EVAL_EVERY = 100
 FT_LR = 3e-5
 HEAD_LR = 1e-3
 
@@ -175,6 +176,7 @@ def main():
 
                 "--per-class", str(PER_CLASS),
                 "--epochs", str(EPOCHS),
+                "--eval-every", str(EVAL_EVERY),
 
                 "--lr", str(FT_LR),
                 "--head-lr", str(HEAD_LR),
